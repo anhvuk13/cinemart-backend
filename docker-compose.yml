@@ -2,13 +2,11 @@ version: '3'
 
 services:
   db:
-    container_name: clj_contacts_db
+    container_name: cinemart_db
     image: postgres:9.6
     ports:
       - 5432:5432
     environment:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: postgres
-      POSTGRES_DB: clj_contacts
-    volumes:
-      - ./pgdata:/var/lib/postgresql/data
+      POSTGRES_DB: cinemart

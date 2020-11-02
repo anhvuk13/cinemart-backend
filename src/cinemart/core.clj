@@ -2,17 +2,22 @@
   (:require [org.httpkit.server :refer [run-server]]
             [reitit.ring :as ring]
             [ring.middleware.cors :refer [wrap-cors]]
-            [reitit.ring.middleware.exception :refer [exception-middleware]]
-            [reitit.ring.middleware.parameters :refer [parameters-middleware]]
-            [reitit.ring.middleware.muuntaja :refer [format-negotiate-middleware
-                                                     format-request-middleware
-                                                     format-response-middleware]]
-            [reitit.ring.coercion :refer [coerce-exceptions-middleware
-                                          coerce-request-middleware
-                                          coerce-response-middleware]]
+            [reitit.ring.middleware.exception
+             :refer [exception-middleware]]
+            [reitit.ring.middleware.parameters
+             :refer [parameters-middleware]]
+            [reitit.ring.middleware.muuntaja
+             :refer [format-negotiate-middleware
+                     format-request-middleware
+                     format-response-middleware]]
+            [reitit.ring.coercion
+             :refer [coerce-exceptions-middleware
+                     coerce-request-middleware
+                     coerce-response-middleware]]
             [reitit.coercion.schema]
             [muuntaja.core :as m]
-            [cinemart.routes :refer [ping-routes contact-routes]]))
+            [cinemart.routes
+             :refer [ping-routes contact-routes]]))
 
 (defonce server (atom nil))
 
@@ -55,11 +60,13 @@
 
 (comment
   (app {:request-method :get
+        :uri "/api/ping"})
+  (app {:request-method :get
         :uri "/api/invalid"})
   (app {:request-method :get
         :uri "/api/contacts"})
   (app {:request-method :delete
-        :uri "/api/contacts/1"})
+        :uri "/api/contacts/3"})
   (app {:request-method :post
         :uri "/api/contacts/"
         :body "{\"first-name\":\"Kelvin\",\"last-name\":\"Mai\",\"email\":\"kelvin.mai002@gmail.com\"}"})

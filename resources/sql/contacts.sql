@@ -13,6 +13,9 @@ CREATE TABLE contacts (
 -- :name get-contacts :? :*
 SELECT * FROM contacts;
 
+-- :name get-first-last :? :*
+SELECT first_name, last_name FROM contacts;
+
 -- :name get-contact-by-id :? :1
 SELECT * FROM contacts
 WHERE id = :id;
