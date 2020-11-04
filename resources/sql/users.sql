@@ -2,30 +2,35 @@
 -- :command :execute
 -- :result :raw
 -- :doc creates users table
-CREATE TABLE users (
+CREATE TABLE IF NOT EXISTS users (
   id SERIAL PRIMARY KEY,
-  first_name TEXT,
-  last_name TEXT,
-  email TEXT,
+  fullname TEXT NOT NULL,
+  dob TEXT NOT NULL,
+  gender TEXT NOT NULL,
+  mail TEXT NOT NULL,
   created_at TIMESTAMP NOT NULL DEFAULT current_timestamp
 );
+
+-- :name drop-users-table :!
+-- :doc drop users table
+DROP TABLE IF EXISTS users;
 
 -- :name get-users :? :*
 SELECT * FROM users;
 
--- :name get-users-by-id :? :1
+-- :name get-user-by-id :? :1
 SELECT * FROM users
 WHERE id = :id;
 
--- :name insert-users :? :1
-INSERT INTO users (first_name, last_name, email)
-VALUES (:first-name, :last-name, :email)
+-- :name insert-user :? :1
+INSERT INTO users (fullname, dob, gender, mail)
+VALUES (:fullname, :dob, :gender, :mail)
 RETURNING id;
 
--- :name update-users-by-id :! :1
+-- :name update-user-by-id :! :1
 UPDATE users
-SET first_name = :first-name, last_name = :last-name, email = :email
+SET fullname = :fullname, dob = :dob, gender = :gender, mail = :mail
 WHERE id = :id;
 
--- :name delete-users-by-id :! :1
+-- :name delete-user-by-id :! :1
 DELETE FROM users WHERE id = :id;

@@ -22,6 +22,7 @@ pom.xml.asc
 
 pgdata
 node_modules
+package-lock.json
 .shadow-cljs
 resources/public/js
 resources/public/css

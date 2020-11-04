@@ -2,7 +2,7 @@
 -- :command :execute
 -- :result :raw
 -- :doc creates contacts table
-CREATE TABLE contacts (
+CREATE TABLE IF NOT EXISTS contacts (
   id SERIAL PRIMARY KEY,
   first_name TEXT,
   last_name TEXT,

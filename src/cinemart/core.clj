@@ -17,16 +17,22 @@
             [reitit.coercion.schema]
             [muuntaja.core :as m]
             [cinemart.routes
-             :refer [ping-routes contact-routes]]))
+             :refer [ping-routes
+                     contact-routes
+                     user-routes
+                     schedule-routes
+                     ticket-routes]]))
 
 (defonce server (atom nil))
 
 (def app
   (ring/ring-handler
    (ring/router
-    [["/api"
-      ping-routes
-      contact-routes]]
+    [ping-routes
+     contact-routes
+     user-routes
+     schedule-routes
+     ticket-routes]
     {:data {:coercion reitit.coercion.schema/coercion
             :muuntaja m/instance
             :middleware [[wrap-cors
