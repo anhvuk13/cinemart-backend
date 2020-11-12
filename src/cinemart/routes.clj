@@ -32,7 +32,8 @@
    ["" {:get get-users
         :post {:parameters {:body {:fullname s/Str
                                    :dob s/Str
-                                   :gender s/Str
+                                   :username s/Str
+                                   :password s/Str
                                    :mail s/Str}}
                :handler create-user}}]
    ["/:id" {:parameters {:path {:id s/Int}}

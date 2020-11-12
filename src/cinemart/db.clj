@@ -1,5 +1,6 @@
 (ns cinemart.db
-  (:require [hugsql.core :as hugsql]))
+  (:require [hugsql.core :as hugsql]
+            [buddy.hashers :as hasher]))
 
 (def config
   {:classname "org.postgresql.Driver"
@@ -25,10 +26,11 @@
   (drop-users-table config)
   (drop-schedules-table config)
   (get-users config)
-  (insert-user config {:fullname "MJ"
+  (insert-user config {:fullname "John doe"
                        :dob "1990-1-1"
-                       :gender "male"
-                       :mail "j@m.mail"})
+                       :username "johndoe"
+                       :password (hasher/derive "password")
+                       :mail "john@doe.com"})
   (insert-schedule config {:film "1"
                            :time "1-1-2000"
                            :seats 200

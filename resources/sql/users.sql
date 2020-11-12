@@ -6,7 +6,8 @@ CREATE TABLE IF NOT EXISTS users (
   id SERIAL PRIMARY KEY,
   fullname TEXT NOT NULL,
   dob TEXT NOT NULL,
-  gender TEXT NOT NULL,
+  username TEXT NOT NULL,
+  password TEXT NOT NULL,
   mail TEXT NOT NULL,
   created_at TIMESTAMP NOT NULL DEFAULT current_timestamp
 );
@@ -23,8 +24,8 @@ SELECT * FROM users
 WHERE id = :id;
 
 -- :name insert-user :? :1
-INSERT INTO users (fullname, dob, gender, mail)
-VALUES (:fullname, :dob, :gender, :mail)
+INSERT INTO users (fullname, dob, username, password, mail)
+VALUES (:fullname, :dob, :username, :password, :mail)
 RETURNING id;
 
 -- :name update-user-by-id :! :1

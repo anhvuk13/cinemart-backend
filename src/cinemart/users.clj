@@ -1,5 +1,6 @@
 (ns cinemart.users
-  (:require [cinemart.db :as db]))
+  (:require [cinemart.db :as db]
+            [buddy.hashers :as hasher]))
 
 (defn get-users
   [_]
@@ -9,7 +10,8 @@
 (defn create-user
   [{:keys [parameters]}]
   (let [data (:body parameters)
-        created-id (db/insert-user db/config data)]
+        pw (hasher/derive (:password data))
+        created-id (db/insert-user db/config (assoc data :password pw))]
     {:status 201
      :body (db/get-user-by-id db/config created-id)}))
 
