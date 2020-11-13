@@ -23,6 +23,10 @@ SELECT * FROM users;
 SELECT * FROM users
 WHERE id = :id;
 
+-- :name get-user-by-mail :? :1
+SELECT * FROM users
+WHERE mail = :mail;
+
 -- :name insert-user :? :1
 INSERT INTO users (fullname, dob, username, password, mail)
 VALUES (:fullname, :dob, :username, :password, :mail)

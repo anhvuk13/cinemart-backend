@@ -22,6 +22,7 @@
 (create-tickets-table config)
 
 (comment
+  (get-user-by-mail config {:mail "john@doe.com"})
   (drop-tickets-table config)
   (drop-users-table config)
   (drop-schedules-table config)

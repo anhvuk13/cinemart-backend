@@ -21,7 +21,8 @@
                      contact-routes
                      user-routes
                      schedule-routes
-                     ticket-routes]]))
+                     ticket-routes
+                     auth-routes]]))
 
 (defonce server (atom nil))
 
@@ -32,7 +33,9 @@
      contact-routes
      user-routes
      schedule-routes
-     ticket-routes]
+     ticket-routes
+     (:login auth-routes)
+     (:register auth-routes)]
     {:data {:coercion reitit.coercion.schema/coercion
             :muuntaja m/instance
             :middleware [[wrap-cors

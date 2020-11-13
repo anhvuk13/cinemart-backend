@@ -1,5 +1,8 @@
 (ns cinemart.routes
   (:require [schema.core :as s]
+            [buddy.auth.backends :as backends]
+            [buddy.auth.middleware :refer [wrap-authentication]]
+            [cinemart.auth :refer [login register]]
             [cinemart.contacts :refer [get-contacts
                                        create-contact
                                        get-contact-by-id
@@ -88,3 +91,14 @@
                                       :email s/Str}}
                   :handler update-contact}
             :delete delete-contact}]])
+
+(def auth-routes
+  {:login ["/login" {:post {:parameters {:body {:mail s/Str
+                                                :password s/Str}}
+                            :handler login}}]
+   :register ["/register" {:post {:parameters {:body {:username s/Str
+                                                      :mail s/Str
+                                                      :password s/Str
+                                                      :dob s/Str
+                                                      :fullname s/Str}}
+                                  :handler register}}]})
