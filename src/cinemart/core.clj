@@ -16,6 +16,8 @@
                      coerce-response-middleware]]
             [reitit.coercion.schema]
             [muuntaja.core :as m]
+            [buddy.auth.backends.token :refer [jws-backend]]
+            [buddy.auth.middleware :refer [wrap-authentication]]
             [cinemart.routes
              :refer [ping-routes
                      contact-routes
@@ -25,8 +27,10 @@
                      auth-routes]]))
 
 (defonce server (atom nil))
+(defonce secret "secret")
+(def backend (jws-backend {:secret secret}))
 
-(def app
+(def ring-app
   (ring/ring-handler
    (ring/router
     [ping-routes
@@ -53,6 +57,9 @@
     (ring/redirect-trailing-slash-handler)
     (ring/create-default-handler
      {:not-found (constantly {:status 404 :body "Route not found"})}))))
+
+(def app (-> ring-app
+             (wrap-authentication backend)))
 
 (defn stop-server []
   (when-not (nil? @server)

@@ -1,13 +1,14 @@
 (ns cinemart.auth
   (:require [cinemart.db :as db]
             [buddy.hashers :as hasher]
-            [buddy.sign.jwt :as jwt]
-            [buddy.auth.backends.httpbasic :refer [http-basic-backend]]))
+            [buddy.sign.jwt :as jwt]))
+
+(defonce secret "secret")
 
 (defn res-user
   [user]
   (-> user
-      (assoc :token (jwt/sign user "secret"))
+      (assoc :token (jwt/sign user secret))
       (dissoc :password)))
 
 (defn register

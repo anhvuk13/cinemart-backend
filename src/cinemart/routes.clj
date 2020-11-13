@@ -1,7 +1,6 @@
 (ns cinemart.routes
   (:require [schema.core :as s]
-            [buddy.auth.backends :as backends]
-            [buddy.auth.middleware :refer [wrap-authentication]]
+            [buddy.auth :refer [authenticated?]]
             [cinemart.auth :refer [login register]]
             [cinemart.contacts :refer [get-contacts
                                        create-contact
@@ -26,9 +25,12 @@
 
 (def ping-routes
   ["/ping" {:name :ping
-            :get (fn [_]
-                   {:status 200
-                    :body {:ping "pong"}})}])
+            :get (fn [req]
+                   (if (authenticated? req)
+                     {:status 200
+                      :body {:ping "pong"}}
+                     {:status 401
+                      :body "Not authorized"}))}])
 
 (def user-routes
   ["/users"
