@@ -8,7 +8,8 @@ CREATE TABLE IF NOT EXISTS users (
   dob TEXT NOT NULL,
   username TEXT NOT NULL,
   password TEXT NOT NULL,
-  mail TEXT NOT NULL,
+  mail TEXT UNIQUE NOT NULL,
+  admin BOOL DEFAULT False,
   created_at TIMESTAMP NOT NULL DEFAULT current_timestamp
 );
 
@@ -28,13 +29,18 @@ SELECT * FROM users
 WHERE mail = :mail;
 
 -- :name insert-user :? :1
-INSERT INTO users (fullname, dob, username, password, mail)
-VALUES (:fullname, :dob, :username, :password, :mail)
+INSERT INTO users (fullname, dob, username, password, mail, admin)
+VALUES (:fullname, :dob, :username, :password, :mail, :admin)
 RETURNING id;
 
 -- :name update-user-by-id :! :1
 UPDATE users
-SET fullname = :fullname, dob = :dob, gender = :gender, mail = :mail
+SET fullname = :fullname, dob = :dob, username = :username, password = :password, mail = :mail
+WHERE id = :id;
+
+-- :name set-user-as-admin :! :1
+UPDATE users
+SET admin = :admin
 WHERE id = :id;
 
 -- :name delete-user-by-id :! :1

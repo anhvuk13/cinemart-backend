@@ -1,5 +1,6 @@
 (ns cinemart.core
   (:require [org.httpkit.server :refer [run-server]]
+            [ring.util.http-response :as res]
             [reitit.ring :as ring]
             [ring.middleware.cors :refer [wrap-cors]]
             [reitit.ring.middleware.exception
@@ -16,30 +17,19 @@
                      coerce-response-middleware]]
             [reitit.coercion.schema]
             [muuntaja.core :as m]
-            [buddy.auth.backends.token :refer [jws-backend]]
-            [buddy.auth.middleware :refer [wrap-authentication]]
-            [cinemart.routes
-             :refer [ping-routes
-                     contact-routes
-                     user-routes
-                     schedule-routes
-                     ticket-routes
-                     auth-routes]]))
+            [cinemart.routes :as r]))
 
 (defonce server (atom nil))
-(defonce secret "secret")
-(def backend (jws-backend {:secret secret}))
 
-(def ring-app
+(def app
   (ring/ring-handler
    (ring/router
-    [ping-routes
-     contact-routes
-     user-routes
-     schedule-routes
-     ticket-routes
-     (:login auth-routes)
-     (:register auth-routes)]
+    [r/ping-routes
+     r/user-routes
+     r/schedule-routes
+     r/ticket-routes
+     r/login
+     r/register]
     {:data {:coercion reitit.coercion.schema/coercion
             :muuntaja m/instance
             :middleware [[wrap-cors
@@ -56,10 +46,7 @@
    (ring/routes
     (ring/redirect-trailing-slash-handler)
     (ring/create-default-handler
-     {:not-found (constantly {:status 404 :body "Route not found"})}))))
-
-(def app (-> ring-app
-             (wrap-authentication backend)))
+     {:not-found (constantly (res/not-found {:error "Route not found"}))}))))
 
 (defn stop-server []
   (when-not (nil? @server)

@@ -1,106 +1,75 @@
 (ns cinemart.routes
   (:require [schema.core :as s]
-            [buddy.auth :refer [authenticated?]]
-            [cinemart.auth :refer [login register]]
-            [cinemart.contacts :refer [get-contacts
-                                       create-contact
-                                       get-contact-by-id
-                                       update-contact
-                                       delete-contact]]
-            [cinemart.users :refer [get-users
-                                    create-user
-                                    get-user-by-id
-                                    update-user
-                                    delete-user]]
-            [cinemart.schedules :refer [get-schedules
-                                        create-schedule
-                                        get-schedule-by-id
-                                        update-schedule
-                                        delete-schedule]]
-            [cinemart.tickets :refer [get-tickets
-                                      create-ticket
-                                      get-ticket-by-id
-                                      update-ticket
-                                      delete-ticket]]))
+            [ring.util.http-response :as res]
+            [cinemart.middleware :as mw]
+            [cinemart.auth :as auth]
+            [cinemart.users :as users]
+            [cinemart.schedules :as schedules]
+            [cinemart.tickets :as tickets]))
 
 (def ping-routes
   ["/ping" {:name :ping
             :get (fn [req]
-                   (if (authenticated? req)
-                     {:status 200
-                      :body {:ping "pong"}}
-                     {:status 401
-                      :body "Not authorized"}))}])
+                   (res/ok {:ping "pong"}))}])
 
 (def user-routes
   ["/users"
-   ["" {:get get-users
+   ["" {:get users/get-users
         :post {:parameters {:body {:fullname s/Str
                                    :dob s/Str
                                    :username s/Str
                                    :password s/Str
-                                   :mail s/Str}}
-               :handler create-user}}]
+                                   :mail s/Str
+                                   :admin s/Str}}
+               :middleware [[mw/bool-field-convert :admin] mw/create-user]
+               :handler users/create-user}}]
    ["/:id" {:parameters {:path {:id s/Int}}
-            :get get-user-by-id
+            :get users/get-user-by-id
             :put {:parameters {:body {:fullname s/Str
                                       :dob s/Str
-                                      :gender s/Str
+                                      :username s/Str
+                                      :password s/Str
                                       :mail s/Str}}
-                  :handler update-user}
-            :delete delete-user}]])
+                  :handler users/update-user}
+            :delete users/delete-user}]])
 
 (def ticket-routes
   ["/tickets"
-   ["" {:get get-tickets
+   ["" {:get tickets/get-tickets
         :post {:parameters {:body {:user-id s/Int
                                    :schedule-id s/Int
                                    :seat s/Int}}
-               :handler create-ticket}}]
-   ["/:id" {:get get-ticket-by-id
+               :handler tickets/create-ticket}}]
+   ["/:id" {:get tickets/get-ticket-by-id
             :put {:parameters {:body {:user-id s/Int
                                       :schedule-id s/Int
                                       :seat s/Int}}
-                  :handler update-ticket}
-            :delete delete-ticket}]])
+                  :handler tickets/update-ticket}
+            :delete tickets/delete-ticket}]])
 
 (def schedule-routes
   ["/schedules"
-   ["" {:get get-schedules
+   ["" {:get schedules/get-schedules
         :post {:parameters {:body {:film s/Str
                                    :room s/Str
                                    :time s/Str
                                    :seats s/Int}}
-               :handler create-schedule}}]
-   ["/:id" {:get get-schedule-by-id
+               :handler schedules/create-schedule}}]
+   ["/:id" {:get schedules/get-schedule-by-id
             :put {:parameters {:body {:film s/Str
                                       :room s/Str
                                       :time s/Str}}
-                  :handler update-schedule}
-            :delete delete-schedule}]])
+                  :handler schedules/update-schedule}
+            :delete schedules/delete-schedule}]])
 
-(def contact-routes
-  ["/contacts"
-   ["" {:get get-contacts
-        :post {:parameters {:body {:first-name s/Str
-                                   :last-name s/Str
-                                   :email s/Str}}
-               :handler create-contact}}]
-   ["/:id" {:parameters {:path {:id s/Int}}
-            :get get-contact-by-id
-            :put {:parameters {:body {:first-name s/Str
-                                      :last-name s/Str
-                                      :email s/Str}}
-                  :handler update-contact}
-            :delete delete-contact}]])
+(def login ["/login" {:post {:parameters {:body {:mail s/Str
+                                                 :password s/Str}}
+                             :handler auth/login}}])
 
-(def auth-routes
-  {:login ["/login" {:post {:parameters {:body {:mail s/Str
-                                                :password s/Str}}
-                            :handler login}}]
-   :register ["/register" {:post {:parameters {:body {:username s/Str
-                                                      :mail s/Str
-                                                      :password s/Str
-                                                      :dob s/Str
-                                                      :fullname s/Str}}
-                                  :handler register}}]})
+(def register ["/register" {:post {:parameters {:body {:username s/Str
+                                                       :mail s/Str
+                                                       :password s/Str
+                                                       :dob s/Str
+                                                       :fullname s/Str}}
+                                   :middleware [mw/add-admin-field mw/create-user]
+                                   :handler users/create-user}}])

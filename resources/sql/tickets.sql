@@ -4,8 +4,8 @@
 -- :doc creates tickets table
 CREATE TABLE IF NOT EXISTS tickets (
   user_id SERIAL NOT NULL,
-  schedule_id INTEGER NOT NULL,
-  seat SERIAL NOT NULL,
+  schedule_id SERIAL NOT NULL,
+  seat INTEGER NOT NULL,
   PRIMARY KEY (user_id, schedule_id, seat),
   CONSTRAINT fk_user
     FOREIGN KEY (user_id)
