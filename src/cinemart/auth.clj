@@ -8,7 +8,6 @@
   (let [mail (get-in parameters [:body :mail])
         user (db/get-user-by-mail db/config {:mail mail})
         password (get-in parameters [:body :password])]
-    (println user)
     (if user
       (if (s/checkpass password user)
         (res/ok {:user (s/add-token user)})

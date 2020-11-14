@@ -1,6 +1,5 @@
 (ns cinemart.db
-  (:require [hugsql.core :as hugsql]
-            [buddy.hashers :as hasher]))
+  (:require [hugsql.core :as hugsql]))
 
 (def config
   {:classname "org.postgresql.Driver"
@@ -8,9 +7,6 @@
    :subname "//localhost:5432/cinemart"
    :user "postgres"
    :password "postgres"})
-
-(hugsql/def-db-fns "sql/contacts.sql")
-(create-contacts-table config)
 
 (hugsql/def-db-fns "sql/users.sql")
 (create-users-table config)
@@ -21,7 +17,16 @@
 (hugsql/def-db-fns "sql/tickets.sql")
 (create-tickets-table config)
 
+(hugsql/def-db-fns "sql/auth.sql")
+(create-auth-table config)
+
 (comment
+  (insert-auth config {:user-id 16 :token "t" :refresh-token "r"})
+  (count-auth config {:user-id 16})
+  (get-auth-by-user-id config {:user-id 16})
+  (get-auth-by-token config {:token "t"})
+  (get-auth-by-refresh-token config {:refresh-token "r"})
+  (delete-auth-by-user-id config {:user-id 16})
   (get-user-by-mail config {:mail "john@doe.com"})
   (drop-tickets-table config)
   (drop-users-table config)

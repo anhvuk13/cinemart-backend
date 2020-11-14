@@ -9,8 +9,9 @@
 
 (def ping-routes
   ["/ping" {:name :ping
-            :get (fn [req]
-                   (res/ok {:ping "pong"}))}])
+            :get {:middleware [mw/authenticate mw/admin]
+                  :handler (fn [req]
+                             (res/ok {:ping "pong"}))}}])
 
 (def user-routes
   ["/users"

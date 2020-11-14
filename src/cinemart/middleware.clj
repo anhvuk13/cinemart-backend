@@ -1,6 +1,7 @@
 (ns cinemart.middleware
   (:require [ring.util.http-response :as res]
-            [cinemart.db :as db]))
+            [cinemart.db :as db]
+            [cinemart.services :as s]))
 
 (defn create-user [next]
   (fn [req]
@@ -20,3 +21,17 @@
      (assoc-in req [:parameters :body field]
                (= "true" (clojure.string/lower-case
                           (get-in req [:parameters :body field])))))))
+
+(defn authenticate [next]
+  (fn [req]
+    (if (s/token-valid? req)
+      (if (s/token-expired? req)
+        (res/unauthorized {:error "Token expired"})
+        (next req))
+      (res/unauthorized {:error "Token invalid"}))))
+
+(defn admin [next]
+  (fn [req]
+    (if (s/admin? req)
+      (next req)
+      (res/unauthorized {:error "Admin place"}))))
