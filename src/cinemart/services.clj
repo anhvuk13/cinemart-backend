@@ -42,13 +42,15 @@
   (h/check password (:password user)))
 
 (defn strip-token [req]
-  (last
-   (clojure.string/split
-    (get-in req [:headers "authorization"]) #" ")))
+  (if-let [token (get-in req [:headers "authorization"])]
+    (last (clojure.string/split token #" "))
+    nil))
 
 (defn token-valid? [req]
-  (not (empty? (db/get-auth-by-token db/config
-                                     {:token (strip-token req)}))))
+  (if-let [token (strip-token req)]
+    (not (empty? (db/get-auth-by-token db/config
+                                       {:token token})))
+    false))
 
 (defn token-expired? [req]
   (let [token (strip-token req)
