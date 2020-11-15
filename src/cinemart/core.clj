@@ -31,18 +31,17 @@
              :swagger {:info {:title "cinemart-api"}
                        :basePath "/"} ;; prefix for all paths
              :handler (swagger/create-swagger-handler)}}]
-     [     r/ping-routes
-r/login
+     r/login
      r/register
      r/token
+     r/ping-routes
      r/user-routes
      r/schedule-routes
-     r/ticket-routes
-     ]
+     r/ticket-routes]
     {:data {:coercion reitit.coercion.schema/coercion
             :muuntaja m/instance
             :middleware [[wrap-cors
-                          :access-control-allow-origin [#"http://localhost:4200"]
+                          :access-control-allow-origin [#".*"]
                           :access-control-allow-methods [:get :post :put :delete]]
                          parameters-middleware
                          format-negotiate-middleware
