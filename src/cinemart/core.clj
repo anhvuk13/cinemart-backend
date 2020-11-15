@@ -34,6 +34,7 @@
      r/login
      r/register
      r/token
+     r/logout
      r/ping-routes
      r/user-routes
      r/schedule-routes

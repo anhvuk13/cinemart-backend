@@ -49,7 +49,8 @@
                                    :schedule-id s/Int
                                    :seat s/Int}}
                :handler tickets/create-ticket}}]
-   ["/:id" {:get tickets/get-ticket-by-id
+   ["/:id" {:parameters {:path {:id s/Int}}
+            :get tickets/get-ticket-by-id
             :put {:parameters {:body {:user-id s/Int
                                       :schedule-id s/Int
                                       :seat s/Int}}
@@ -65,7 +66,8 @@
                                    :seats s/Int}}
                :middleware [mw/authenticate]
                :handler schedules/create-schedule}}]
-   ["/:id" {:get schedules/get-schedule-by-id
+   ["/:id" {:parameters {:path {:id s/Int}}
+            :get schedules/get-schedule-by-id
             :put {:parameters {:body {:film s/Str
                                       :room s/Str
                                       :time s/Str}}
@@ -82,6 +84,12 @@
                       :post {:parameters {:body {:mail s/Str
                                                  :password s/Str}}
                              :handler auth/login}}])
+
+(def logout ["/logout" {:swagger {:tags ["auth"]}
+                        :parameters {:header {:authorization s/Str}}
+                        :middleware [mw/authenticate]}
+             ["" {:post auth/logout}]
+             ["/all" {:post auth/logout-all}]])
 
 (def register ["/register" {:swagger {:tags ["auth"]}
                             :post {:parameters {:body {:username s/Str

@@ -8,6 +8,9 @@ CREATE TABLE IF NOT EXISTS schedules (
   room TEXT NOT NULL,
   time TEXT NOT NULL,
   seats INTEGER NOT NULL,
+  CONSTRAINT fk_film
+    FOREIGN KEY (film)
+      REFERENCES movies (id),
   created_at TIMESTAMP NOT NULL DEFAULT current_timestamp
 );
 

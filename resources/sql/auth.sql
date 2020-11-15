@@ -57,14 +57,9 @@ DELETE FROM auth
 WHERE user_id = :user-id
 AND refresh_token = :refresh-token;
 
--- :name delete-current-auth :! :n
-DELETE FROM auth
-WHERE user_id = :user-id
-AND token = :token
-AND refresh_token = :refresh-token;
-
 -- :name delete-all-but-current-auth :! :n
 DELETE FROM auth
 WHERE user_id = :user-id
-AND token != :token
-AND refresh_token != :refresh-token;
+AND token != :token;
+
+

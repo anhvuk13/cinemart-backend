@@ -11,6 +11,9 @@
 (hugsql/def-db-fns "sql/users.sql")
 (create-users-table config)
 
+(hugsql/def-db-fns "sql/movies.sql")
+(create-movies-table config)
+
 (hugsql/def-db-fns "sql/schedules.sql")
 (create-schedules-table config)
 
@@ -21,6 +24,8 @@
 (create-auth-table config)
 
 (comment
+  (delete-all-but-current-auth config {:user-id 2
+                                       :token "eyJhbGciOiJIUzI1NiJ9.eyJhZG1pbiI6ZmFsc2UsInBhc3N3b3JkIjoiYmNyeXB0K3NoYTUxMiQ2NmQ1MDhmYmQ3NmZmNTc5YjcyMDYxMmVlODRjNzY3YSQxMiQyNjE3NDFiNWQwZmRjNmIwZTQ2NDk2M2RkZTE4NTNhNDA4ZDRjYWI0ZjgwZTlhMTAiLCJtYWlsIjoic3RyaW5nIiwiZXhwIjoxNjA1NDY2MjQ1OTI4LCJ1c2VybmFtZSI6InN0cmluZyIsImZ1bGxuYW1lIjoic3RyaW5nIiwiZG9iIjoic3RyaW5nIiwiaWQiOjIsImNyZWF0ZWRfYXQiOjE2MDU0NTUxODd9.ZujYDPZU0yb_ZkxMp5q5s1NWprt8YH3GebBNdt8XdOg"})
   (insert-auth config {:user-id 16 :token "t" :refresh-token "r"})
   (count-auth config {:user-id 16})
   (get-auth-by-user-id config {:user-id 16})

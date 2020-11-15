@@ -37,6 +37,22 @@
         (res/unauthorized {:error "Wrong password"}))
       (res/not-found {:error "User not found"}))))
 
+(defn logout [req]
+  (let [token (s/strip-token req)
+        user (s/decreate-token token)]
+    (db/delete-auth-by-token db/config
+                             {:user-id (:id user)
+                              :token token})
+    (res/ok {:user user})))
+
+(defn logout-all [req]
+  (let [token (s/strip-token req)
+        user (s/decreate-token token)]
+    (db/delete-all-but-current-auth db/config
+                                    {:user-id (:id user)
+                                     :token token})
+    (res/ok {:user user})))
+
 (comment
   (refresh {:headers {"authorization" "Token eyJhbGciOiJIUzI1NiJ9.eyJhZG1pbiI6ZmFsc2UsInBhc3N3b3JkIjoiYmNyeXB0K3NoYTUxMiQyOWEyYmZlYWE2NjMzNzA0ODdlMjNkNTNiYTRmMmQxYSQxMiRjNWQzOTIxNTY3ZWIwNGIyNTVlNjE5Nzk5NzYxYzAyM2FkNzhjNzExNzIyY2JiMzgiLCJtYWlsIjoibXJAZG9lIiwiZXhwIjoxNjA1NDE0MTY4NzY3LCJ1c2VybmFtZSI6Im1yZG9lIiwiZnVsbG5hbWUiOiJNciBEb2UiLCJkb2IiOiIxLTMtMTk2MCIsImlkIjoxNywiY3JlYXRlZF9hdCI6MTYwNTM3NDcyNn0.9djdr_yDsVhh4E_p5lcEXI-ilOwtbhH_zGrwv3P4eoQ"}})
   (register {:parameters {:body {:mail "miss@john.com"
