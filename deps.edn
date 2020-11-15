@@ -2,6 +2,8 @@
  :deps {org.clojure/clojure {:mvn/version "1.10.1"}
         metosin/reitit {:mvn/version "0.5.10"}
         metosin/ring-http-response {:mvn/version "0.9.1"}
+        metosin/reitit-swagger {:mvn/version "0.5.10"}
+        metosin/reitit-swagger-ui {:mvn/version "0.5.10"}
         ring-cors/ring-cors {:mvn/version "0.1.13"}
         http-kit/http-kit {:mvn/version "2.5.0"}
         org.postgresql/postgresql {:mvn/version "42.2.18"}

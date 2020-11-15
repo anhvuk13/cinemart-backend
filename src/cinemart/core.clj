@@ -2,6 +2,8 @@
   (:require [org.httpkit.server :refer [run-server]]
             [ring.util.http-response :as res]
             [reitit.ring :as ring]
+            [reitit.swagger :as swagger]
+            [reitit.swagger-ui :as swagger-ui]
             [ring.middleware.cors :refer [wrap-cors]]
             [reitit.ring.middleware.exception
              :refer [exception-middleware]]
@@ -24,13 +26,19 @@
 (def app
   (ring/ring-handler
    (ring/router
-    [r/ping-routes
+    [["/swagger.json"
+      {:get {:no-doc true
+             :swagger {:info {:title "cinemart-api"}
+                       :basePath "/"} ;; prefix for all paths
+             :handler (swagger/create-swagger-handler)}}]
+     [     r/ping-routes
+r/login
+     r/register
+     r/token
      r/user-routes
      r/schedule-routes
      r/ticket-routes
-     r/token
-     r/login
-     r/register]
+     ]
     {:data {:coercion reitit.coercion.schema/coercion
             :muuntaja m/instance
             :middleware [[wrap-cors
@@ -45,6 +53,7 @@
                          coerce-request-middleware
                          coerce-response-middleware]}})
    (ring/routes
+    (swagger-ui/create-swagger-ui-handler {:path "/"})
     (ring/redirect-trailing-slash-handler)
     (ring/create-default-handler
      {:not-found (constantly (res/not-found {:error "Route not found"}))}))))
