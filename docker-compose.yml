@@ -11,7 +11,7 @@ services:
       POSTGRES_PASSWORD: postgres
       POSTGRES_DB: cinemart
     volumes:
-      - ./pdb:/var/lib/postgresql/data
+      - pdb:/var/lib/postgresql/data
   server:
     container_name: cinemart_server
     build: .
@@ -21,3 +21,5 @@ services:
     volumes:
       - .:/usr/src/app
     command: ["./wait-for-it.sh", "db:5432", "--", "clojure", "-M:docker-repl"]
+volumes:
+  pdb:
