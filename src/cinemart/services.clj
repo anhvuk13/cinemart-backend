@@ -52,24 +52,45 @@
                                        {:token token})))
     false))
 
+(defn ref-token-valid? [req]
+  (if-let [ref-token (strip-token req)]
+    (not (empty? (db/get-auth-by-refresh-token db/config
+                                               {:refresh-token ref-token})))
+    false))
+
 (defn token-expired? [req]
   (let [token (strip-token req)
         user-info (decreate-token token)
         exp (:exp user-info)
         id (:id user-info)]
-    (if (< (now) exp)
-      false
-      (db/delete-auth-by-token db/config
-                               {:user-id id
-                                :token token}))))
+    (if (< (now) exp) false [id token])))
+
+(defn ref-token-expired? [req]
+  (if-let [[id token] (token-expired? req)]
+    (db/delete-auth-by-refresh-token db/config
+                                     {:user-id id
+                                      :refresh-token token})
+    false))
 
 (defn admin? [req]
   (:admin (decreate-token (strip-token req))))
 
+(defn revoke-all-expired-tokens [{:keys [id]}]
+  (doseq [{:keys [refresh_token]}
+          (db/get-auth-by-user-id db/config
+                                  {:user-id id})]
+    (let [exp (:exp (jwt/unsign refresh_token secret))]
+      (if (>= (now) exp)
+        (db/delete-auth-by-refresh-token
+         db/config
+         {:user-id id
+          :refresh-token refresh_token})))))
+
 (comment
-  (admin? {:headers {"authorization" "eyJhbGciOiJIUzI1NiJ9.eyJhZG1pbiI6ZmFsc2UsInBhc3N3b3JkIjoiYmNyeXB0K3NoYTUxMiQyOWEyYmZlYWE2NjMzNzA0ODdlMjNkNTNiYTRmMmQxYSQxMiRjNWQzOTIxNTY3ZWIwNGIyNTVlNjE5Nzk5NzYxYzAyM2FkNzhjNzExNzIyY2JiMzgiLCJtYWlsIjoibXJAZG9lIiwiZXhwIjoxNjA1Mzg4MTg5MTU5LCJ1c2VybmFtZSI6Im1yZG9lIiwiZnVsbG5hbWUiOiJNciBEb2UiLCJkb2IiOiIxLTMtMTk2MCIsImlkIjoxNywiY3JlYXRlZF9hdCI6MTYwNTM3NDcyNn0.qjkkcV7DVSLpJc7-MfQCHJLdboQ3fmoAGl0eTWsoZZU"}})
+  (revoke-all-expired-tokens {:id 17})
+  (ref-token-expired? {:headers {"authorization" "eyJhbGciOiJIUzI1NiJ9.eyJhZG1pbiI6ZmFsc2UsInBhc3N3b3JkIjoiYmNyeXB0K3NoYTUxMiQyOWEyYmZlYWE2NjMzNzA0ODdlMjNkNTNiYTRmMmQxYSQxMiRjNWQzOTIxNTY3ZWIwNGIyNTVlNjE5Nzk5NzYxYzAyM2FkNzhjNzExNzIyY2JiMzgiLCJtYWlsIjoibXJAZG9lIiwiZXhwIjoxNjA1NDI0MDkwMzgwLCJ1c2VybmFtZSI6Im1yZG9lIiwiZnVsbG5hbWUiOiJNciBEb2UiLCJkb2IiOiIxLTMtMTk2MCIsImlkIjoxNywiY3JlYXRlZF9hdCI6MTYwNTM3NDcyNn0.eVpnqs_VndTDE8Y126yr1hhJgAVHL-4hq6LWavOA8Eg"}})
   (let [user (add-token {:name "alo"})
         token (:token user)
         refresh-token (:refresh-token user)]
-    ;(jwt/unsign token secret)
+    (jwt/unsign token secret)
     (jwt/unsign refresh-token secret)))

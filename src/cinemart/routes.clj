@@ -14,7 +14,7 @@
                              (res/ok {:ping "pong"}))}}])
 
 (def user-routes
-  ["/users"
+  ["/users" {:middleware [mw/authenticate mw/admin]}
    ["" {:get users/get-users
         :post {:parameters {:body {:fullname s/Str
                                    :dob s/Str
@@ -35,8 +35,9 @@
             :delete users/delete-user}]])
 
 (def ticket-routes
-  ["/tickets"
-   ["" {:get tickets/get-tickets
+  ["/tickets" {:middleware [mw/authenticate]}
+   ["" {:get {:middleware [mw/admin]
+              :handler tickets/get-tickets}
         :post {:parameters {:body {:user-id s/Int
                                    :schedule-id s/Int
                                    :seat s/Int}}
@@ -55,13 +56,19 @@
                                    :room s/Str
                                    :time s/Str
                                    :seats s/Int}}
+               :middleware [mw/authenticate]
                :handler schedules/create-schedule}}]
    ["/:id" {:get schedules/get-schedule-by-id
             :put {:parameters {:body {:film s/Str
                                       :room s/Str
                                       :time s/Str}}
+                  :middleware [mw/authenticate mw/admin]
                   :handler schedules/update-schedule}
-            :delete schedules/delete-schedule}]])
+            :delete {:middleware [mw/authenticate mw/admin]
+                     :handler schedules/delete-schedule}}]])
+
+(def token ["/token" {:post {:middleware [mw/reauthenticate]
+                             :handler auth/refresh}}])
 
 (def login ["/login" {:post {:parameters {:body {:mail s/Str
                                                  :password s/Str}}

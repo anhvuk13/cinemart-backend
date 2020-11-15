@@ -28,6 +28,7 @@
      r/user-routes
      r/schedule-routes
      r/ticket-routes
+     r/token
      r/login
      r/register]
     {:data {:coercion reitit.coercion.schema/coercion
