@@ -80,4 +80,4 @@
                                                        :dob s/Str
                                                        :fullname s/Str}}
                                    :middleware [mw/add-admin-field mw/create-user]
-                                   :handler users/create-user}}])
+                                   :handler auth/register}}])

@@ -14,6 +14,17 @@
               (dissoc user
                       [:token :refresh-token]))})))
 
+(defn register [{:keys [parameters]}]
+  (let [data (:body parameters)
+        user (-> data
+                 (s/hashpass)
+                 ((partial db/insert-user db/config))
+                 ((partial db/get-user-by-id db/config))
+                 (s/add-token))]
+    (res/created
+     (str "/user/" (:id user))
+     {:user user})))
+
 (defn login [{:keys [parameters]}]
   (let [mail (get-in parameters [:body :mail])
         user (db/get-user-by-mail db/config {:mail mail})

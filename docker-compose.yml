@@ -1,4 +1,4 @@
-version: '3'
+version: '3.8'
 
 services:
   db:
@@ -10,6 +10,8 @@ services:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: postgres
       POSTGRES_DB: cinemart
+    volumes:
+      - ./pdb:/var/lib/postgresql/data
   server:
     container_name: cinemart_server
     build: .

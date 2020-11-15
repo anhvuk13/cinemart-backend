@@ -1,6 +1,6 @@
 (ns cinemart.users
   (:require [cinemart.db :as db]
-            [buddy.hashers :as h]
+            [cinemart.services :as s]
             [ring.util.http-response :as res]))
 
 (defn get-users
@@ -10,10 +10,10 @@
 (defn create-user [{:keys [parameters]}]
   (let [data (:body parameters)
         user (-> data
-                 (assoc :password
-                        (h/derive (:password data)))
+                 (s/hashpass)
                  ((partial db/insert-user db/config))
-                 ((partial db/get-user-by-id db/config)))]
+                 ((partial db/get-user-by-id db/config))
+                 (dissoc :password))]
     (res/created
      (str "/user/" (:id user))
      {:user user})))
