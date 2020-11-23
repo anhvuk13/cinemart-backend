@@ -5,19 +5,46 @@
             [cinemart.middleware :as mw]
             [cinemart.auth :as auth]
             [cinemart.users :as users]
+            [cinemart.movies :as movies]
             [cinemart.schedules :as schedules]
+            [cinemart.theaters :as theaters]
             [cinemart.tickets :as tickets]))
 
+(def Bool (s/enum "true" "True" "false" "False"))
+
 (def ping-routes
-  ["/ping" {:parameters {:header {:authorization s/Str}}
-            :swagger {:tags ["test"]}
+  ["/ping" {:swagger {:tags ["ping"]}
             :name :ping
-            :get {:middleware [mw/authenticate]
-                  :handler (fn [req]
+            :get {:handler (fn [req]
                              (res/ok {:ping "pong"}))}}])
 
+(def movie-routes
+  ["/movies" {:swagger {:tags ["movies"]}}
+   ["" {:get movies/get-movies
+        :post movies/create-movie}]
+   ["/:id" {:parameters {:path {:id s/Str}}
+            :get movies/get-movie-by-id
+            :put movies/update-movie
+            :delete movies/delete-movie}]])
+
+(def theater-routes
+  ["/theaters" {:swagger {:tags ["theaters"]}}
+   ["" {:get theaters/get-theaters
+        :post {:parameters {:body {:name s/Str
+                                   :address s/Str}}
+               :middleware [mw/auth mw/admin]
+               :handler theaters/create-theater}}]
+   ["/:id" {:parameters {:path {:id s/Int}}
+            :get theaters/get-theater-by-id
+            :put {:middleware [mw/auth mw/manager-or-admin]
+                  :parameters {:body {:name s/Str
+                                      :address s/Str}}
+                  :handler theaters/update-theater}
+            :delete {:middleware [mw/auth mw/admin]
+                     :handler theaters/delete-theater}}]])
+
 (def user-routes
-  ["/users" {:middleware [mw/authenticate mw/admin]
+  ["/users" {:middleware [mw/auth mw/admin]
              :parameters {:header {:authorization s/Str}}
              :swagger {:tags ["users"]}}
    ["" {:get users/get-users
@@ -25,9 +52,8 @@
                                    :dob s/Str
                                    :username s/Str
                                    :password s/Str
-                                   :mail s/Str
-                                   :admin s/Str}}
-               :middleware [[mw/bool-field-convert :admin] mw/create-user]
+                                   :mail s/Str}}
+               :middleware [mw/create-user]
                :handler users/create-user}}]
    ["/:id" {:parameters {:path {:id s/Int}}
             :get users/get-user-by-id
@@ -41,21 +67,15 @@
 
 (def ticket-routes
   ["/tickets" {:swagger {:tags ["tickets"]}
-               :middleware [mw/authenticate]
-               :parameters {:header {:authorization s/Str}}}
-   ["" {:get {:middleware [mw/admin]
-              :handler tickets/get-tickets}
-        :post {:parameters {:body {:user-id s/Int
-                                   :schedule-id s/Int
-                                   :seat s/Int}}
-               :handler tickets/create-ticket}}]
-   ["/:id" {:parameters {:path {:id s/Int}}
-            :get tickets/get-ticket-by-id
-            :put {:parameters {:body {:user-id s/Int
-                                      :schedule-id s/Int
-                                      :seat s/Int}}
-                  :handler tickets/update-ticket}
-            :delete tickets/delete-ticket}]])
+               :middleware [mw/auth]
+               :parameters {:header {:authorization s/Str}}
+               :post {:parameters {:body {:invoice s/Int
+                                          :seat s/Int
+                                          :price s/Int}}
+                      :handler tickets/create-ticket}
+               :delete {:parameters {:body {:invoice s/Int
+                                            :seat s/Int}}
+                        :handler tickets/delete-ticket}}])
 
 (def schedule-routes
   ["/schedules" {:swagger {:tags ["schedules"]}}
@@ -64,32 +84,34 @@
                                    :room s/Str
                                    :time s/Str
                                    :seats s/Int}}
-               :middleware [mw/authenticate]
+               :middleware [mw/auth]
                :handler schedules/create-schedule}}]
    ["/:id" {:parameters {:path {:id s/Int}}
             :get schedules/get-schedule-by-id
             :put {:parameters {:body {:film s/Str
                                       :room s/Str
                                       :time s/Str}}
-                  :middleware [mw/authenticate mw/admin]
+                  :middleware [mw/auth mw/admin]
                   :handler schedules/update-schedule}
-            :delete {:middleware [mw/authenticate mw/admin]
+            :delete {:middleware [mw/auth mw/admin]
                      :handler schedules/delete-schedule}}]])
 
 (def token ["/token" {:swagger {:tags ["auth"]}
-                      :post {:middleware [mw/reauthenticate]
+                      :post {:middleware [mw/reauth]
                              :handler auth/refresh}}])
 
 (def login ["/login" {:swagger {:tags ["auth"]}
                       :post {:parameters {:body {:mail s/Str
                                                  :password s/Str}}
-                             :handler auth/login}}])
+                             :handler (fn
+                                        [req]
+                                        (auth/login req "user"))}}])
 
 (def logout ["/logout" {:swagger {:tags ["auth"]}
                         :parameters {:header {:authorization s/Str}}
-                        :middleware [mw/authenticate]}
+                        :middleware [mw/auth]}
              ["" {:post auth/logout}]
-             ["/all" {:post auth/logout-all}]])
+             ["/all" {:post auth/logout}]])
 
 (def register ["/register" {:swagger {:tags ["auth"]}
                             :post {:parameters {:body {:username s/Str
@@ -97,5 +119,5 @@
                                                        :password s/Str
                                                        :dob s/Str
                                                        :fullname s/Str}}
-                                   :middleware [mw/add-admin-field mw/create-user]
+                                   :middleware [mw/create-user]
                                    :handler auth/register}}])

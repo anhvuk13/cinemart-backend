@@ -83,4 +83,10 @@
   (app {:request-method :post
         :uri "/api/contacts/"
         :body "{\"first-name\":\"Kelvin\",\"last-name\":\"Mai\",\"email\":\"kelvin.mai002@gmail.com\"}"})
+  (app {:request-method :post
+        :uri "/api/contacts/"
+        :body "{\"first-name\":\"Kelvin\",\"last-name\":\"Mai\",\"email\":\"kelvin.mai002@gmail.com\"}"})
+  (app {:request-method :post
+        :uri "/login"
+        :body "{ \"mail\": \"john@doe\", \"password\": \"password\"}"})
   (restart-server))

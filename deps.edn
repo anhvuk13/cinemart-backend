@@ -16,7 +16,7 @@
  :aliases {:run {:main-opts ["-m" "cinemart.core"]}
            :repl {:main-opts ["-m" "nrepl.cmdline"
                               "-b" "0.0.0.0"
-                              "-p" "13370"
+                              "-p" "13371"
                               "--middleware" "[cider.nrepl/cider-middleware]"
                               "--interactive"]}
            :docker-repl {:main-opts ["-m" "nrepl.cmdline"

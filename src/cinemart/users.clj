@@ -18,14 +18,6 @@
      (str "/user/" (:id user))
      {:user user})))
 
-(comment
-  (create-user
-   {:parameters {:body {:username "johndoe"
-                        :mail "john@doe.com"
-                        :fullname "John Doe"
-                        :dob "1/1/1"
-                        :password "password"}}}))
-
 (defn get-user-by-id
   [{:keys [parameters]}]
   (let [id (:path parameters)

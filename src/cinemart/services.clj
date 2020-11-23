@@ -5,33 +5,33 @@
 (import java.util.Date)
 
 (defonce secret "secret")
-(defonce token-valid 1)
-(defonce ref-token-valid 5)
+(defonce token-valid 60)
+(defonce ref-token-valid 300)
 
 (defn now []
   (* (.getTime (java.util.Date.))))
 
 (defn token-exp []
-  (+ (now) (* 60000 token-valid)))
+  (+ (now) (* 1000 token-valid)))
 
 (defn ref-token-exp []
-  (+ (now) (* 60000 ref-token-valid)))
+  (+ (now) (* 1000 ref-token-valid)))
 
 (defn create-token [user exp]
-  (jwt/sign user secret {:exp exp}))
+  (jwt/sign (assoc user :expire exp) secret {:exp (inc exp)}))
 
 (defn decreate-token [token]
   (try
     (jwt/unsign token secret)
     (catch Exception e nil)))
 
-(defn add-token [user]
-  (let [user (assoc user
-                    :token (create-token user (token-exp))
-                    :refresh-token (create-token user (ref-token-exp)))]
+(defn add-token [data role]
+  (let [info (assoc data :role role)
+        user (assoc info :token
+                    (create-token info (token-exp))
+                    :refresh-token (create-token info (ref-token-exp)))]
     (db/insert-auth db/config
-                    {:user-id (:id user)
-                     :token (:token user)
+                    {:token (:token user)
                      :refresh-token (:refresh-token user)})
     (dissoc user :password)))
 
@@ -46,51 +46,31 @@
     (last (clojure.string/split token #" "))
     nil))
 
-(defn token-valid? [req]
+(defn valid? [req get-auth key]
   (if-let [token (strip-token req)]
-    (not (empty? (db/get-auth-by-token db/config
-                                       {:token token})))
+    (not (empty? (get-auth db/config
+                           {key token})))
     false))
+
+(defn token-valid? [req]
+  (valid? req db/get-auth-by-token :token))
 
 (defn ref-token-valid? [req]
-  (if-let [ref-token (strip-token req)]
-    (not (empty? (db/get-auth-by-refresh-token db/config
-                                               {:refresh-token ref-token})))
-    false))
+  (valid? req db/get-auth-by-refresh-token :refresh-token))
 
-(defn token-expired? [req]
+(defn not-expired? [req if-statement]
   (let [token (strip-token req)
-        user-info (decreate-token token)
-        exp (:exp user-info)
-        id (:id user-info)]
-    (if (< (now) exp) false [id token])))
+        exp (:expire (decreate-token token))]
+    (if (< (now) exp) (if-statement token) false)))
 
-(defn ref-token-expired? [req]
-  (if-let [[id token] (token-expired? req)]
-    (db/delete-auth-by-refresh-token db/config
-                                     {:user-id id
-                                      :refresh-token token})
-    false))
+(defn token-not-expired? [req]
+  (not-expired? req #(:role (decreate-token %))))
 
-(defn admin? [req]
-  (:admin (decreate-token (strip-token req))))
+(defn ref-token-not-expired? [req]
+  (not-expired?
+   req
+   #(db/delete-auth-by-refresh-token
+     db/config
+     {:refresh-token %})))
 
-(defn revoke-all-expired-tokens [{:keys [id]}]
-  (doseq [{:keys [refresh_token]}
-          (db/get-auth-by-user-id db/config
-                                  {:user-id id})]
-    (let [exp (:exp (jwt/unsign refresh_token secret))]
-      (if (>= (now) exp)
-        (db/delete-auth-by-refresh-token
-         db/config
-         {:user-id id
-          :refresh-token refresh_token})))))
-
-(comment
-  (revoke-all-expired-tokens {:id 17})
-  (ref-token-expired? {:headers {"authorization" "eyJhbGciOiJIUzI1NiJ9.eyJhZG1pbiI6ZmFsc2UsInBhc3N3b3JkIjoiYmNyeXB0K3NoYTUxMiQyOWEyYmZlYWE2NjMzNzA0ODdlMjNkNTNiYTRmMmQxYSQxMiRjNWQzOTIxNTY3ZWIwNGIyNTVlNjE5Nzk5NzYxYzAyM2FkNzhjNzExNzIyY2JiMzgiLCJtYWlsIjoibXJAZG9lIiwiZXhwIjoxNjA1NDI0MDkwMzgwLCJ1c2VybmFtZSI6Im1yZG9lIiwiZnVsbG5hbWUiOiJNciBEb2UiLCJkb2IiOiIxLTMtMTk2MCIsImlkIjoxNywiY3JlYXRlZF9hdCI6MTYwNTM3NDcyNn0.eVpnqs_VndTDE8Y126yr1hhJgAVHL-4hq6LWavOA8Eg"}})
-  (let [user (add-token {:name "alo"})
-        token (:token user)
-        refresh-token (:refresh-token user)]
-    (jwt/unsign token secret)
-    (jwt/unsign refresh-token secret)))
+(comment)
