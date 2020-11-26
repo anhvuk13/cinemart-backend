@@ -58,6 +58,12 @@
 (defn ref-token-valid? [req]
   (valid? req db/get-auth-by-refresh-token :refresh-token))
 
+(defn alive? [token]
+  (< (now) (:expire (decreate-token token))))
+
+(defn dead? [token]
+  (not (alive? token)))
+
 (defn not-expired? [req if-statement]
   (let [token (strip-token req)
         exp (:expire (decreate-token token))]

@@ -32,22 +32,12 @@
         (res/unauthorized {:error "Wrong password"}))
       (res/not-found {:error "User not found"}))))
 
-;; log out from current token
-
-(defn logout [req]
-  (let [token (s/strip-token req)]
-    (db/delete-auth-by-token db/config
-                             {:token token})
-    (res/ok {:info (-> (s/decreate-token token)
-                       (dissoc :password :exp :expire))
-             :message "Logged out"})))
-
 ;; log out from other device
 
 (defn delete-other-tokens-bound-to-user
   (;; delete all other tokens
-   [req current-token]
-   (delete-other-tokens-bound-to-user req current-token (fn [_] true)))
+   [info current-token]
+   (delete-other-tokens-bound-to-user info current-token (fn [_] true)))
   (;; delete other tokens with additional condition (check)
    [{:keys [role id]} current-token check]
    (doseq [t (db/get-auth db/config)]
@@ -55,19 +45,37 @@
            info (s/decreate-token token)
            info-id (:id info)
            info-role (:role info)]
-       (if (and (= id info-id)
-                (= role info-role)
-                (not= token current-token)
-                (check token))
-         (do
-           (println (check token))
-           (db/delete-auth-by-token db/config {:token token})))))))
+       (if (or (not info)
+               (and (= id info-id)
+                    (= role info-role)
+                    (not= token current-token)
+                    (check t)))
+         (db/delete-auth-by-token db/config {:token token}))))))
 
 (defn logout-from-other-devices [req]
   (let [token (s/strip-token req)]
     (delete-other-tokens-bound-to-user
      (s/decreate-token token) token))
   (res/ok {:message "Logged out from all other devices"}))
+
+;; log out from current token
+
+(defn delete-other-tokens-bound-to-user-if-expired [info current-token]
+  (delete-other-tokens-bound-to-user info current-token
+                                     #(s/dead? (:refresh_token %))))
+
+(comment (def tok "eyJhbGciOiJIUzI1NiJ9.eyJyb2xlIjoidXNlciIsInBhc3N3b3JkIjoiYmNyeXB0K3NoYTUxMiRmMTJhMTY1ODkzZjg4OTJhMGFlMmQ2YjQyYTM4OGY0ZSQxMiRiZDA5Mzk0M2RjN2MyNjA4YmIzMjJkMjc3OWY2MDkzNGYzNGZkMThjMGU3ODY2ODQiLCJtYWlsIjoic3RyaW5nIiwiZXhwIjoxNjA2NDAzMDQ1NzQ4LCJ1c2VybmFtZSI6InN0cmluZyIsImZ1bGxuYW1lIjoic3RyaW5nIiwiZXhwaXJlIjoxNjA2NDAzMDQ1NzQ3LCJkb2IiOiJzdHJpbmciLCJpZCI6MTksImNyZWF0ZWRfYXQiOjE2MDYzOTk4ODB9.HJlhhL0KCsJKTATK_dT4OhEpAUeAYLckbhrd0Epv8A8")
+         (delete-other-tokens-bound-to-user-if-expired
+          (s/decreate-token tok) tok))
+
+(defn logout [req]
+  (let [token (s/strip-token req)
+        info (s/decreate-token token)]
+    (delete-other-tokens-bound-to-user-if-expired info token)
+    (db/delete-auth-by-token db/config
+                             {:token token})
+    (res/ok {:info (dissoc info :password :exp :expire)
+             :message "Logged out"})))
 
 ;; tests
 
