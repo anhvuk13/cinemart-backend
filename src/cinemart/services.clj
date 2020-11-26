@@ -5,7 +5,7 @@
 (import java.util.Date)
 
 (defonce secret "secret")
-(defonce token-valid 60)
+(defonce token-valid 120)
 (defonce ref-token-valid 300)
 
 (defn now []
@@ -33,7 +33,7 @@
     (db/insert-auth db/config
                     {:token (:token user)
                      :refresh-token (:refresh-token user)})
-    (dissoc user :password)))
+    (dissoc user :exp :expire :password)))
 
 (defn hashpass [user]
   (assoc user :password (h/derive (:password user))))
@@ -72,5 +72,11 @@
    #(db/delete-auth-by-refresh-token
      db/config
      {:refresh-token %})))
+
+(defn get-func-by-role [role]
+  (case role
+    "admin" [db/get-admin-by-id db/update-admin-by-id db/delete-admin-by-id]
+    "manager" [db/get-manager-by-id db/update-manager-by-id db/delete-manager-by-id]
+    [db/get-user-by-id db/update-user-by-id db/delete-user-by-id]))
 
 (comment)

@@ -4,6 +4,13 @@
             [cinemart.services :as s]
             [cinemart.auth :as auth]))
 
+(defn hashpass [next]
+  (fn [req]
+    (let [info (get-in req [:parameters :body])]
+      (if (:password info)
+        (next (assoc-in req [:parameters :body] (s/hashpass info)))
+        (next req)))))
+
 (defn create-person [req next get-by-mail]
   (let [mail (get-in req [:parameters :body :mail])]
     (if (get-by-mail db/config {:mail mail})

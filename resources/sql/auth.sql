@@ -16,11 +16,11 @@ DROP TABLE IF EXISTS auth;
 -- :name get-auth :? :*
 SELECT * FROM auth;
 
--- :name get-auth-by-token :? :*
+-- :name get-auth-by-token :? :1
 SELECT * FROM auth
 WHERE token = :token;
 
--- :name get-auth-by-refresh-token :? :*
+-- :name get-auth-by-refresh-token :? :1
 SELECT * FROM auth
 WHERE refresh_token = :refresh-token;
 

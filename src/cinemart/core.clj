@@ -31,10 +31,11 @@
              :swagger {:info {:title "cinemart-api"}
                        :basePath "/"} ;; prefix for all paths
              :handler (swagger/create-swagger-handler)}}]
-     r/login
      r/register
-     r/token
+     r/login
      r/logout
+     r/refresh-token
+     r/me-routes
      r/ping-routes
      r/user-routes
      r/schedule-routes
@@ -72,14 +73,9 @@
   (-main))
 
 (comment
-  (app {:request-method :get
-        :uri "/api/ping"})
-  (app {:request-method :get
-        :uri "/api/invalid"})
-  (app {:request-method :get
-        :uri "/api/contacts"})
-  (app {:request-method :delete
-        :uri "/api/contacts/3"})
+  (app {:request-method :post
+        :uri "/login"
+        :body "{\"mail\":\"string\",\"password\":\"string\"}"})
   (app {:request-method :post
         :uri "/api/contacts/"
         :body "{\"first-name\":\"Kelvin\",\"last-name\":\"Mai\",\"email\":\"kelvin.mai002@gmail.com\"}"})

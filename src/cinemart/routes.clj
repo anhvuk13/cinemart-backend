@@ -4,6 +4,7 @@
             [ring.util.http-response :as res]
             [cinemart.middleware :as mw]
             [cinemart.auth :as auth]
+            [cinemart.me :as me]
             [cinemart.users :as users]
             [cinemart.movies :as movies]
             [cinemart.schedules :as schedules]
@@ -45,7 +46,7 @@
 
 (def user-routes
   ["/users" {:middleware [mw/auth mw/admin]
-             :parameters {:header {:authorization s/Str}}
+             :parameters {:header {(s/optional-key :authorization) s/Str}}
              :swagger {:tags ["users"]}}
    ["" {:get users/get-users
         :post {:parameters {:body {:fullname s/Str
@@ -68,7 +69,7 @@
 (def ticket-routes
   ["/tickets" {:swagger {:tags ["tickets"]}
                :middleware [mw/auth]
-               :parameters {:header {:authorization s/Str}}
+               :parameters {:header {(s/optional-key :authorization) s/Str}}
                :post {:parameters {:body {:invoice s/Int
                                           :seat s/Int
                                           :price s/Int}}
@@ -96,22 +97,34 @@
             :delete {:middleware [mw/auth mw/admin]
                      :handler schedules/delete-schedule}}]])
 
-(def token ["/token" {:swagger {:tags ["auth"]}
-                      :post {:middleware [mw/reauth]
-                             :handler auth/refresh}}])
+(def me-routes ["/me" {:swagger {:tags ["me"]}
+                       :parameters {:header {(s/optional-key :authorization) s/Str}}
+                       :middleware [mw/auth]
+                       :get me/get-my-info
+                       :put {:parameters {:body {(s/optional-key :fullname) s/Str
+                                                 (s/optional-key :username) s/Str
+                                                 (s/optional-key :mail) s/Str
+                                                 (s/optional-key :password) s/Str
+                                                 (s/optional-key :dob) s/Str}}
+                             :middleware [mw/hashpass]
+                             :handler me/update-my-info}}])
+
+(def refresh-token ["/refresh-token" {:swagger {:tags ["auth"]}
+                                      :parameters {:header {(s/optional-key :authorization) s/Str}}
+                                      :post {:middleware [mw/reauth]
+                                             :handler auth/refresh}}])
 
 (def login ["/login" {:swagger {:tags ["auth"]}
                       :post {:parameters {:body {:mail s/Str
                                                  :password s/Str}}
-                             :handler (fn
-                                        [req]
+                             :handler (fn [req]
                                         (auth/login req "user"))}}])
 
 (def logout ["/logout" {:swagger {:tags ["auth"]}
-                        :parameters {:header {:authorization s/Str}}
+                        :parameters {:header {(s/optional-key :authorization) s/Str}}
                         :middleware [mw/auth]}
              ["" {:post auth/logout}]
-             ["/all" {:post auth/logout}]])
+             ["/other-devices" {:post auth/logout-from-other-devices}]])
 
 (def register ["/register" {:swagger {:tags ["auth"]}
                             :post {:parameters {:body {:username s/Str
@@ -119,5 +132,6 @@
                                                        :password s/Str
                                                        :dob s/Str
                                                        :fullname s/Str}}
-                                   :middleware [mw/create-user]
-                                   :handler auth/register}}])
+                                   :middleware [mw/create-user mw/hashpass]
+                                   :handler (fn [req]
+                                              (auth/register req "user"))}}])
