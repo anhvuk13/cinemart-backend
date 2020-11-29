@@ -1,5 +1,6 @@
 (ns cinemart.db
-  (:require [hugsql.core :as hugsql]))
+  (:require [hugsql.core :as hugsql]
+            [buddy.hashers :as h]))
 
 (def config
   {:classname "org.postgresql.Driver"
@@ -34,6 +35,10 @@
 
 (hugsql/def-db-fns "sql/admins.sql")
 (create-admins-table config)
+;; add admin if no admin exists
+(if (= 0 (:count (count-admins config)))
+  (insert-admin config {:mail "admin@cinemart.com"
+                        :password (h/derive "admin")}))
 
 (hugsql/def-db-fns "sql/auth.sql")
 (create-auth-table config)

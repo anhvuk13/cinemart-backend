@@ -16,6 +16,9 @@ DROP TABLE IF EXISTS admins;
 -- :name get-admins :? :*
 SELECT * FROM admins;
 
+-- :name count-admins :? :1
+SELECT COUNT(*) FROM admins;
+
 -- :name get-admin-by-id :? :1
 SELECT * FROM admins
 WHERE id = :id;
