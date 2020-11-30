@@ -21,13 +21,52 @@
   (fn [req]
     (create-person req next db/get-user-by-mail)))
 
-(defn create-manager [next]
-  (fn [req]
-    (create-person req next db/get-manager-by-mail)))
+;; check if token valid
 
-(defn create-admin [next]
+(defn basic-valid [req next get-auth key]
+  (let [token (get-in req [:parameters :header :authorization])
+        info (s/decreate-token token)]
+    (if token
+      (if (and info
+               (get-auth db/config {key token}))
+        (next (assoc req :token token :info info))
+        (res/unauthorized {:error "Token invalid"}))
+      (res/unauthorized {:error "Token required"}))))
+
+(defn token-valid [next]
   (fn [req]
-    (create-person req next db/get-admin-by-mail)))
+    (basic-valid req next db/get-auth-by-token :token)))
+
+(defn rtoken-valid [next]
+  (fn [req]
+    (basic-valid (assoc req :refresh-token true) next
+                 db/get-auth-by-refresh-token
+                 :refresh-token)))
+
+;; check if token not expired
+
+(defn not-expired [next]
+  (fn [req]
+    (if (< (s/now) (get-in req [:info :expire]))
+      (next req)
+      (if (:refresh-token req)
+        (do
+          (db/delete-auth-by-refresh-token db/config {:refresh-token (:token req)})
+          (res/unauthorized {:error "Token expired"}))))))
+
+(defn roles [next & r]
+  (fn [req]
+    (if (contains? r (:role req))
+      (next req)
+      (res/unauthorized
+       {:error (str
+                (apply str (interpose ", " r))
+                " place")}))))
+
+(comment
+  (db/delete-auth-by-refresh-token db/config {:refresh-token "eyJhbGciOiJIUzI1NiJ9.eyJyb2xlIjoidXNlciIsInBhc3N3b3JkIjoiYmNyeXB0K3NoYTUxMiQ1MDM0YzFjNGNlM2E2YjhlNDNhNmQ5OTQ5ZGE3MGViZCQxMiQzYjc5MTA5NTczNTUyMWUyMTRlZmY0NGEzODY2ZTU0Yzc5NGRjMGY4YWE4OTFkOTIiLCJtYWlsIjoic3RyaW5nIiwiZXhwIjoxNjA2Njk5MzQ3NTg3LCJ1c2VybmFtZSI6InN0cmluZyIsImZ1bGxuYW1lIjoic3RyaW5nIiwiZXhwaXJlIjoxNjA2Njk5MzQ3NTg2LCJkb2IiOiJzdHJpbmciLCJpZCI6MjUsImNyZWF0ZWRfYXQiOjE2MDY2NTM0NTR9.yIB4gXm0d0JFDtt0DyLf5z2dKoo8FCjWa1PsyhVLNo8"}))
+
+;; check if login
 
 (defn basic-auth [req next valid? not-expired?]
   (if (valid? req)

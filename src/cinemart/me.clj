@@ -3,18 +3,12 @@
             [cinemart.db :as db]
             [cinemart.services :as s]))
 
-(defn get-my-info [req]
-  (let [token (:token (db/get-auth-by-token
-                       db/config {:token (s/strip-token req)}))]
-    (if token
-      (res/ok {:me (-> (s/decreate-token token)
-                       (dissoc :password :expire :exp))})
-      (res/not-found {:error "token invalid"}))))
+(defn get-my-info [{:keys [info]}]
+  (res/ok {:me (dissoc info :exp :expire :password)}))
 
 (defn update-my-info [req]
-  (let [token (s/strip-token req)
-        me (-> (s/decreate-token token)
-               (dissoc :password :expire :exp))
+  (let [token (:token req)
+        me (:info req)
         role (:role me)
         id (:id me)
         [get-db update-db _] (s/get-func-by-role role)
@@ -22,12 +16,21 @@
         updated-data (merge me update-data)
         updated-count (update-db db/config updated-data)]
     (if (= 1 updated-count)
-      (do
-        (db/delete-auth-by-token db/config {:token token})
-        (res/ok {:updated true
-                 :me (s/add-token updated-data role)}))
-      (res/not-found {:updated false
-                      :error (str "Unable to update " role)}))))
+      (db/delete-auth-by-token db/config {:token token})
+      (res/ok {:updated true
+               :me (s/add-token updated-data role)}))
+    (res/not-found {:updated false
+                    :error (str "Unable to update " role)})))
+
+(defn delete-my-account [{:keys [token info]}]
+  (let [id (:id info)
+        role (:role info)
+        [get-db _ delete-db] (s/get-func-by-role role)
+        account (get-db db/config {:id id})]
+    (delete-db db/config {:id id})
+    (db/delete-auth-by-token db/config {:token token})
+    (res/ok {:message "deleted"
+             :account account})))
 
 (comment
   (def req

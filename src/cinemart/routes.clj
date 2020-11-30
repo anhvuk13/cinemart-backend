@@ -16,8 +16,26 @@
 (def ping-routes
   ["/ping" {:swagger {:tags ["ping"]}
             :name :ping
-            :get {:handler (fn [req]
-                             (res/ok {:ping "pong"}))}}])
+            :parameters {:header {(s/optional-key :authorization) s/Str}}
+            :get {:summary "just ping"
+                  :handler (fn [req]
+                             (res/ok {:ping "pong"}))}
+            :post {:summary "login to ping"
+                   :middleware [mw/token-valid mw/not-expired]
+                   :handler (fn [req]
+                              (res/ok {:ping "pong"}))}
+            :put {:summary "ping as manager"
+                  :middleware [mw/token-valid mw/not-expired [mw/roles "manager"]]
+                  :handler (fn [req]
+                             (res/ok {:ping "pong"}))}
+            :patch {:summary "ping as manager or admin"
+                    :middleware [mw/token-valid mw/not-expired [mw/roles "admin" "manager"]]
+                    :handler (fn [req]
+                               (res/ok {:ping "pong"}))}
+            :delete {:summary "ping as admin"
+                     :middleware [mw/token-valid mw/not-expired [mw/roles "admin"]]
+                     :handler (fn [req]
+                                (res/ok {:ping "pong"}))}}])
 
 (def movie-routes
   ["/movies" {:swagger {:tags ["movies"]}}
@@ -99,8 +117,9 @@
 
 (def me-routes ["/me" {:swagger {:tags ["me"]}
                        :parameters {:header {(s/optional-key :authorization) s/Str}}
-                       :middleware [mw/auth]
+                       :middleware [mw/token-valid mw/not-expired]
                        :get me/get-my-info
+                       :delete me/delete-my-account
                        :put {:parameters {:body {(s/optional-key :fullname) s/Str
                                                  (s/optional-key :username) s/Str
                                                  (s/optional-key :mail) s/Str
@@ -111,7 +130,7 @@
 
 (def refresh-token ["/refresh-token" {:swagger {:tags ["auth"]}
                                       :parameters {:header {(s/optional-key :authorization) s/Str}}
-                                      :post {:middleware [mw/reauth]
+                                      :post {:middleware [mw/rtoken-valid mw/not-expired]
                                              :handler auth/refresh}}])
 
 (def login ["/login" {:swagger {:tags ["auth"]}
@@ -122,7 +141,7 @@
 
 (def logout ["/logout" {:swagger {:tags ["auth"]}
                         :parameters {:header {(s/optional-key :authorization) s/Str}}
-                        :middleware [mw/auth]}
+                        :middleware [mw/token-valid mw/not-expired]}
              ["" {:post auth/logout}]
              ["/other-devices" {:post auth/logout-from-other-devices}]])
 

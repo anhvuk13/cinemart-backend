@@ -3,13 +3,11 @@
             [cinemart.db :as db]
             [cinemart.services :as s]))
 
-(defn refresh [req]
-  (let [ref-token (s/strip-token req)
-        user (s/decreate-token ref-token)]
-    (db/delete-auth-by-refresh-token db/config
-                                     {:refresh-token ref-token})
-    (res/ok {:user
-             (s/add-token user (:role user))})))
+(defn refresh [{:keys [token info]}]
+  (db/delete-auth-by-refresh-token db/config
+                                   {:refresh-token token})
+  (res/ok {:user
+           (s/add-token info (:role info))}))
 
 (defn register [{:keys [parameters]}, role]
   (let [data (:body parameters)
@@ -52,10 +50,8 @@
                     (check t)))
          (db/delete-auth-by-token db/config {:token token}))))))
 
-(defn logout-from-other-devices [req]
-  (let [token (s/strip-token req)]
-    (delete-other-tokens-bound-to-user
-     (s/decreate-token token) token))
+(defn logout-from-other-devices [{:keys [token info]}]
+  (delete-other-tokens-bound-to-user info token)
   (res/ok {:message "Logged out from all other devices"}))
 
 ;; log out from current token
@@ -68,14 +64,12 @@
          (delete-other-tokens-bound-to-user-if-expired
           (s/decreate-token tok) tok))
 
-(defn logout [req]
-  (let [token (s/strip-token req)
-        info (s/decreate-token token)]
-    (delete-other-tokens-bound-to-user-if-expired info token)
-    (db/delete-auth-by-token db/config
-                             {:token token})
-    (res/ok {:info (dissoc info :password :exp :expire)
-             :message "Logged out"})))
+(defn logout [{:keys [token info]}]
+  (delete-other-tokens-bound-to-user-if-expired info token)
+  (db/delete-auth-by-token db/config
+                           {:token token})
+  (res/ok {:info (dissoc info :password :exp :expire)
+           :message "Logged out"}))
 
 ;; tests
 
