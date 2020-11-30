@@ -118,9 +118,13 @@
 (def me-routes ["/me" {:swagger {:tags ["me"]}
                        :parameters {:header {(s/optional-key :authorization) s/Str}}
                        :middleware [mw/token-valid mw/not-expired]
-                       :get me/get-my-info
-                       :delete me/delete-my-account
-                       :put {:parameters {:body {(s/optional-key :fullname) s/Str
+                       :get {:summary "get your profile"
+                             :handler me/get-my-info}
+                       :delete {:summary "delete your profile"
+                                :handler me/delete-my-account}
+                       :put {:summary "update your account info"
+                             :description "Provide which key:value pairs need to be changed. The current pair of tokens will also be renewed."
+                             :parameters {:body {(s/optional-key :fullname) s/Str
                                                  (s/optional-key :username) s/Str
                                                  (s/optional-key :mail) s/Str
                                                  (s/optional-key :password) s/Str
@@ -128,12 +132,14 @@
                              :middleware [mw/hashpass]
                              :handler me/update-my-info}}])
 
-(def refresh-token ["/refresh-token" {:swagger {:tags ["auth"]}
+(def refresh-token ["/refresh-token" {:summary "acquire new pair of tokens"
+                                      :swagger {:tags ["auth"]}
                                       :parameters {:header {(s/optional-key :authorization) s/Str}}
                                       :post {:middleware [mw/rtoken-valid mw/not-expired]
                                              :handler auth/refresh}}])
 
-(def login ["/login" {:swagger {:tags ["auth"]}
+(def login ["/login" {:summary "login user account"
+                      :swagger {:tags ["auth"]}
                       :post {:parameters {:body {:mail s/Str
                                                  :password s/Str}}
                              :handler (fn [req]
@@ -142,10 +148,13 @@
 (def logout ["/logout" {:swagger {:tags ["auth"]}
                         :parameters {:header {(s/optional-key :authorization) s/Str}}
                         :middleware [mw/token-valid mw/not-expired]}
-             ["" {:post auth/logout}]
-             ["/other-devices" {:post auth/logout-from-other-devices}]])
+             ["" {:summary "logout & revoke current being used pair of tokens"
+                  :post auth/logout}]
+             ["/other-devices" {:summary "revoke all other pairs of tokens bound to current user except the one being used"
+                                :post auth/logout-from-other-devices}]])
 
 (def register ["/register" {:swagger {:tags ["auth"]}
+                            :summary "register a new user account"
                             :post {:parameters {:body {:username s/Str
                                                        :mail s/Str
                                                        :password s/Str
