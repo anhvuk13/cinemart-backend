@@ -53,10 +53,9 @@
   (fn [req]
     (if (< (s/now) (get-in req [:info :expire]))
       (next req)
-      (if (:refresh-token req)
-        (do
-          (db/delete-auth-by-refresh-token db/config {:refresh-token (:token req)})
-          (res/unauthorized {:error "Token expired"}))))))
+      (do (when (:refresh-token req)
+            (db/delete-auth-by-refresh-token db/config {:refresh-token (:token req)}))
+          (res/unauthorized {:error "Token expired"})))))
 
 (defn roles [next & r]
   (fn [req]

@@ -13,29 +13,27 @@
 
 (def Bool (s/enum "true" "True" "false" "False"))
 
+(defn ping-handler [req]
+  (res/ok {:ping "pong"}))
+
 (def ping-routes
   ["/ping" {:swagger {:tags ["ping"]}
             :name :ping
             :parameters {:header {(s/optional-key :authorization) s/Str}}
             :get {:summary "just ping"
-                  :handler (fn [req]
-                             (res/ok {:ping "pong"}))}
+                  :handler ping-handler}
             :post {:summary "login to ping"
                    :middleware [mw/token-valid mw/not-expired]
-                   :handler (fn [req]
-                              (res/ok {:ping "pong"}))}
+                   :handler ping-handler}
             :put {:summary "ping as manager"
                   :middleware [mw/token-valid mw/not-expired [mw/roles "manager"]]
-                  :handler (fn [req]
-                             (res/ok {:ping "pong"}))}
+                  :handler ping-handler}
             :patch {:summary "ping as manager or admin"
                     :middleware [mw/token-valid mw/not-expired [mw/roles "admin" "manager"]]
-                    :handler (fn [req]
-                               (res/ok {:ping "pong"}))}
+                    :handler ping-handler}
             :delete {:summary "ping as admin"
                      :middleware [mw/token-valid mw/not-expired [mw/roles "admin"]]
-                     :handler (fn [req]
-                                (res/ok {:ping "pong"}))}}])
+                     :handler ping-handler}}])
 
 (def movie-routes
   ["/movies" {:swagger {:tags ["movies"]}}
