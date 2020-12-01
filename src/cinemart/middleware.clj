@@ -25,7 +25,7 @@
 
 (defn basic-valid [req next get-auth key]
   (let [t (get-in req [:parameters :header :authorization])
-        token (if t (last (clojure.string/split #" ")) nil)
+        token (if (string? t) (last (clojure.string/split t #" ")) nil)
         info (s/decreate-token token)]
     (if token
       (if (and info
@@ -45,7 +45,6 @@
                  :refresh-token)))
 
 ;; check if token not expired
-
 (defn not-expired [next]
   (fn [req]
     (if (< (s/now) (get-in req [:info :expire]))
