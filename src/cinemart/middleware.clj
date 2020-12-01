@@ -24,11 +24,8 @@
 ;; check if token valid
 
 (defn basic-valid [req next get-auth key]
-  (let [token
-        (-> req
-            (get-in [:parameters :header :authorization])
-            (clojure.string/split #" ")
-            (last))
+  (let [t (get-in req [:parameters :header :authorization])
+        token (if t (last (clojure.string/split #" ")) nil)
         info (s/decreate-token token)]
     (if token
       (if (and info
