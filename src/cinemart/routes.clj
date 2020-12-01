@@ -22,18 +22,24 @@
             :parameters {:header {(s/optional-key :authorization) s/Str}}
             :get {:summary "just ping"
                   :handler ping-handler}
-            :post {:summary "login to ping"
+            :head {:summary "login to ping"
                    :middleware [mw/token-valid mw/not-expired]
                    :handler ping-handler}
-            :put {:summary "ping as manager"
-                  :middleware [mw/token-valid mw/not-expired [mw/roles "manager"]]
+            :post {:summary "ping as user"
+                   :middleware [mw/token-valid mw/not-expired [mw/roles "user"]]
+                   :handler ping-handler}
+            :put {:summary "ping as user or admin"
+                  :middleware [mw/token-valid mw/not-expired [mw/roles "user" "admin"]]
                   :handler ping-handler}
-            :patch {:summary "ping as manager or admin"
-                    :middleware [mw/token-valid mw/not-expired [mw/roles "admin" "manager"]]
-                    :handler ping-handler}
-            :delete {:summary "ping as admin"
-                     :middleware [mw/token-valid mw/not-expired [mw/roles "admin"]]
-                     :handler ping-handler}}])
+            :delete {:summary "ping as manager"
+                     :middleware [mw/token-valid mw/not-expired [mw/roles "manager"]]
+                     :handler ping-handler}
+            :options {:summary "ping as manager or admin"
+                      :middleware [mw/token-valid mw/not-expired [mw/roles "admin" "manager"]]
+                      :handler ping-handler}
+            :patch {:summary "ping as admin"
+                    :middleware [mw/token-valid mw/not-expired [mw/roles "admin"]]
+                    :handler ping-handler}}])
 
 (def movie-routes
   ["/movies" {:swagger {:tags ["movies"]}}

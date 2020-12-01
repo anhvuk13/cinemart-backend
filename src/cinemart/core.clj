@@ -44,7 +44,7 @@
             :muuntaja m/instance
             :middleware [[wrap-cors
                           :access-control-allow-origin [#".*"]
-                          :access-control-allow-methods [:get :post :put :delete]]
+                          :access-control-allow-methods [:get :post :put :patch :delete :head :options :trace]]
                          parameters-middleware
                          format-negotiate-middleware
                          format-response-middleware
