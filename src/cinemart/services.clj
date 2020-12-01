@@ -79,6 +79,12 @@
      db/config
      {:refresh-token %})))
 
+(defn mail-get-func-by-role [role]
+  (case role
+    "admin" [db/get-admin-by-mail]
+    "manager" [db/get-manager-by-mail]
+    [db/get-user-by-mail]))
+
 (defn get-func-by-role [role]
   (case role
     "admin" [db/get-admin-by-id db/update-admin-by-id db/delete-admin-by-id]

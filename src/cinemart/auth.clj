@@ -21,7 +21,8 @@
 
 (defn login [{:keys [parameters]} role]
   (let [mail (get-in parameters [:body :mail])
-        user (db/get-user-by-mail db/config {:mail mail})
+        [get-db] (s/mail-get-func-by-role role)
+        user (get-db db/config {:mail mail})
         password (get-in parameters [:body :password])]
     (if user
       (if (try (s/checkpass password user)

@@ -136,12 +136,18 @@
                                       :post {:middleware [mw/rtoken-valid mw/not-expired]
                                              :handler auth/refresh}}])
 
-(def login ["/login" {:summary "login user account"
-                      :swagger {:tags ["auth"]}
-                      :post {:parameters {:body {:mail s/Str
-                                                 :password s/Str}}
-                             :handler (fn [req]
-                                        (auth/login req "user"))}}])
+(def login ["/login" {:swagger {:tags ["auth"]}
+                      :parameters {:body {:mail s/Str
+                                          :password s/Str}}}
+            ["" {:summary "login user account"
+                 :post (fn [req]
+                         (auth/login req "user"))}]
+            ["/manager" {:summary "login manager account"
+                         :post (fn [req]
+                                 (auth/login req "manager"))}]
+            ["/admin" {:summary "login admin account"
+                       :post (fn [req]
+                               (auth/login req "admin"))}]])
 
 (def logout ["/logout" {:swagger {:tags ["auth"]}
                         :parameters {:header {(s/optional-key :authorization) s/Str}}

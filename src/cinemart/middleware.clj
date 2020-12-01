@@ -1,5 +1,6 @@
 (ns cinemart.middleware
-  (:require [ring.util.http-response :as res]
+  (:require [clojure.string :refer [split]]
+            [ring.util.http-response :as res]
             [cinemart.db :as db]
             [cinemart.services :as s]
             [cinemart.auth :as auth]))
@@ -25,7 +26,7 @@
 
 (defn basic-valid [req next get-auth key]
   (let [t (get-in req [:parameters :header :authorization])
-        token (if (string? t) (last (clojure.string/split t #" ")) nil)
+        token (if (string? t) (last (split t #" ")) nil)
         info (s/decreate-token token)]
     (if token
       (if (and info
@@ -55,7 +56,7 @@
 
 (defn roles [next & r]
   (fn [req]
-    (if (contains? r (:role req))
+    (if (some #(= % (get-in req [:info :role])) r)
       (next req)
       (res/unauthorized
        {:error (str
@@ -63,6 +64,7 @@
                 " place")}))))
 
 (comment
+  ((roles #(println %) "admin" "user" "manager") {:role "manager"})
   (db/delete-auth-by-refresh-token db/config {:refresh-token "eyJhbGciOiJIUzI1NiJ9.eyJyb2xlIjoidXNlciIsInBhc3N3b3JkIjoiYmNyeXB0K3NoYTUxMiQ1MDM0YzFjNGNlM2E2YjhlNDNhNmQ5OTQ5ZGE3MGViZCQxMiQzYjc5MTA5NTczNTUyMWUyMTRlZmY0NGEzODY2ZTU0Yzc5NGRjMGY4YWE4OTFkOTIiLCJtYWlsIjoic3RyaW5nIiwiZXhwIjoxNjA2Njk5MzQ3NTg3LCJ1c2VybmFtZSI6InN0cmluZyIsImZ1bGxuYW1lIjoic3RyaW5nIiwiZXhwaXJlIjoxNjA2Njk5MzQ3NTg2LCJkb2IiOiJzdHJpbmciLCJpZCI6MjUsImNyZWF0ZWRfYXQiOjE2MDY2NTM0NTR9.yIB4gXm0d0JFDtt0DyLf5z2dKoo8FCjWa1PsyhVLNo8"}))
 
 ;; check if login
