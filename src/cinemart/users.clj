@@ -34,7 +34,7 @@
         updated-count (db/update-user-by-id db/config user)]
     (if (= 1 updated-count)
       (do
-        (s/revoke-all-tokens id "user")
+        (s/revoke-all-tokens id "user" [])
         (res/ok {:updated true
                  :user (db/get-user-by-id db/config {:id id})}))
       (res/not-found

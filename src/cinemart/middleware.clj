@@ -37,8 +37,7 @@
         token (if (string? t) (last (split t #" ")) nil)
         info (s/decreate-token token)]
     (if token
-      (if (and info
-               (get-auth db/config {key token}))
+      (if (get-auth db/config {key token})
         (next (assoc req :token token :info info))
         (res/unauthorized {:error "Token invalid"}))
       (res/unauthorized {:error "Token required"}))))
@@ -56,7 +55,8 @@
 ;; check if token not expired
 (defn not-expired [next]
   (fn [req]
-    (if (< (s/now) (get-in req [:info :expire]))
+    (if (and (:info req)
+             (< (s/now) (get-in req [:info :expire])))
       (next req)
       (do (when (:refresh-token req)
             (db/delete-auth-by-refresh-token db/config {:refresh-token (:token req)}))

@@ -40,7 +40,7 @@
           updated-count (update-db db/config account)]
       (if (= 1 updated-count)
         (do
-          (s/revoke-all-tokens id role)
+          (s/revoke-all-tokens id role [])
           (res/ok {:updated true
                    :before-updated old-data
                    :after-updated (get-db db/config id)}))

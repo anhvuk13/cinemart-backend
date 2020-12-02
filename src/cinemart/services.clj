@@ -58,11 +58,13 @@
 (defn ref-token-valid? [req]
   (valid? req db/get-auth-by-refresh-token :refresh-token))
 
-(defn alive? [token]
-  (< (now) (:expire (decreate-token token))))
+(defn token-alive? [token]
+  (let [t (decreate-token token)]
+    (and (boolean t)
+         (< (now) (:expire (decreate-token token))))))
 
-(defn dead? [token]
-  (not (alive? token)))
+(defn token-dead? [token]
+  (not (token-alive? token)))
 
 (defn not-expired? [req if-statement]
   (let [token (strip-token req)
@@ -79,15 +81,20 @@
      db/config
      {:refresh-token %})))
 
-(defn revoke-all-tokens [id role]
+(defn revoke-all-tokens [id role checklist]
   (doseq [t (db/get-auth db/config)]
     (let [token (:token t)
-          info (decreate-token token)
+          rtoken (:refresh_token t)
+          info (decreate-token rtoken)
           info-id (:id info)
           info-role (:role info)]
       (if (or (not info)
               (and (= id info-id)
-                   (= role info-role)))
+                   (= role info-role)
+                   (reduce
+                    (fn [res item]
+                      (and res (item t)))
+                    true checklist)))
         (db/delete-auth-by-token db/config {:token token})))))
 
 (defn insert-func-by-role [role]
