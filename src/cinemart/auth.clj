@@ -27,7 +27,7 @@
       (if (try (s/checkpass password account)
                (catch Exception e false))
         (res/ok {(keyword role) (s/add-token account role)})
-        (res/unauthorized {:error "Wrong password"}))
+        (res/unauthorized {:error "wrong password"}))
       (res/not-found {:error (str role " not found")}))))
 
 ;; log out from other device and clean dead tokens
@@ -36,7 +36,7 @@
    (:id info) (:role info)
    [(fn [t]
       (not= token (:token t)))])
-  (res/ok {:message "Logged out from all other devices"}))
+  (res/ok {:message "logged out from all other devices"}))
 
 ;; log out and clean dead tokens
 (defn logout [{:keys [token info]}]
@@ -46,7 +46,7 @@
       (or (s/token-dead? (:refresh_token t))
           (= token (:token t))))])
   (res/ok {:info (dissoc info :password :exp :expire)
-           :message "Logged out"}))
+           :message "logged out"}))
 
 ;; tests
 

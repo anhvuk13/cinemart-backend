@@ -60,7 +60,7 @@
     (swagger-ui/create-swagger-ui-handler {:path "/"})
     (ring/redirect-trailing-slash-handler)
     (ring/create-default-handler
-     {:not-found (constantly (res/not-found {:error "Route not found"}))}))))
+     {:not-found (constantly (res/not-found {:error "route not found"}))}))))
 
 (defn stop-server []
   (when-not (nil? @server)

@@ -5,7 +5,7 @@
 CREATE TABLE IF NOT EXISTS theaters (
   id SERIAL PRIMARY KEY,
   name TEXT NOT NULL,
-  address TEXT NOT NULL UNIQUE,
+  address TEXT UNIQUE NOT NULL,
   created_at TIMESTAMP NOT NULL DEFAULT current_timestamp
 );
 
