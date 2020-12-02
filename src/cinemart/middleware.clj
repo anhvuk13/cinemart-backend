@@ -22,6 +22,14 @@
   (fn [req]
     (create-person req next db/get-user-by-mail)))
 
+(defn create-manager [next]
+  (fn [req]
+    (create-person req next db/get-manager-by-mail)))
+
+(defn create-admin [next]
+  (fn [req]
+    (create-person req next db/get-admin-by-mail)))
+
 ;; check if token valid
 
 (defn basic-valid [req next get-auth key]
@@ -62,6 +70,17 @@
        {:error (str
                 (apply str (interpose ", " r))
                 " place")}))))
+
+(defn managing? [next]
+  (fn [req]
+    (if (and ((get-in req [:info :role]) "manager")
+             (empty?
+              (db/check-management-exists
+               db/config
+               {:theater (get-in req [:parameters :path :id])
+                :manager (get-in req [:info :id])})))
+      (res/unauthorized {:error "You're not in charge of managing this theater"})
+      (next req))))
 
 (comment
   ((roles #(println %) "admin" "user" "manager") {:role "manager"})

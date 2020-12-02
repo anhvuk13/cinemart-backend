@@ -37,7 +37,12 @@ WHERE theater = :theater;
 -- :name insert-management :? :1
 INSERT INTO management (manager, theater)
 VALUES (:manager, :theater)
-RETURNING id;
+RETURNING *;
+
+-- :name check-management-exists :? :1
+SELECT * FROM management
+WHERE manager = :manager
+AND theater = :theater;
 
 -- :name delete-management-by-manager-and-theater :! :1
 DELETE FROM management

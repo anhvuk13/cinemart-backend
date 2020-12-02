@@ -16,7 +16,7 @@
         updated-data (merge me update-data)
         updated-count (update-db db/config updated-data)]
     (if (= 1 updated-count)
-      (db/delete-auth-by-token db/config {:token token})
+      (s/revoke-all-tokens id role)
       (res/ok {:updated true
                :me (s/add-token updated-data role)}))
     (res/not-found {:updated false

@@ -79,11 +79,34 @@
      db/config
      {:refresh-token %})))
 
+(defn revoke-all-tokens [id role]
+  (doseq [t (db/get-auth db/config)]
+    (let [token (:token t)
+          info (decreate-token token)
+          info-id (:id info)
+          info-role (:role info)]
+      (if (or (not info)
+              (and (= id info-id)
+                   (= role info-role)))
+        (db/delete-auth-by-token db/config {:token token})))))
+
+(defn insert-func-by-role [role]
+  (case role
+    "admin" [db/insert-admin]
+    "manager" [db/insert-manager]
+    [db/insert-user]))
+
 (defn mail-get-func-by-role [role]
   (case role
     "admin" [db/get-admin-by-mail]
     "manager" [db/get-manager-by-mail]
     [db/get-user-by-mail]))
+
+(defn get-many-func-by-role [role]
+  (case role
+    "admin" [db/get-admins]
+    "manager" [db/get-managers]
+    [db/get-users]))
 
 (defn get-func-by-role [role]
   (case role

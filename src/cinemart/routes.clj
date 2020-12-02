@@ -5,7 +5,7 @@
             [cinemart.middleware :as mw]
             [cinemart.auth :as auth]
             [cinemart.me :as me]
-            [cinemart.users :as users]
+            [cinemart.persons :as persons]
             [cinemart.movies :as movies]
             [cinemart.schedules :as schedules]
             [cinemart.theaters :as theaters]
@@ -52,41 +52,99 @@
 
 (def theater-routes
   ["/theaters" {:swagger {:tags ["theaters"]}}
-   ["" {:get theaters/get-theaters
-        :post {:parameters {:body {:name s/Str
+   ["" {:get {:summary "show all theater"
+              :handler theaters/get-theaters}
+        :post {:summary "(admin) create a new theater"
+               :description "Only admins take responsibility to create a theater."
+               :parameters {:body {:name s/Str
                                    :address s/Str}}
-               :middleware [mw/auth mw/admin]
+               :middleware [mw/token-valid mw/not-expired [mw/roles "admin"]]
                :handler theaters/create-theater}}]
    ["/:id" {:parameters {:path {:id s/Int}}
-            :get theaters/get-theater-by-id
-            :put {:middleware [mw/auth mw/manager-or-admin]
+            :get {:summary "get details of a specific theater"
+                  :handler theaters/get-theater-by-id}
+            :put {:summary "(admin|manager) update theater's info"
+                  :description "Managers who manage the current theater or any admins can update this theater info."
+                  :middleware [mw/token-valid mw/not-expired [mw/roles "admin" "manager"] mw/managing?]
                   :parameters {:body {:name s/Str
                                       :address s/Str}}
                   :handler theaters/update-theater}
-            :delete {:middleware [mw/auth mw/admin]
+            :delete {:summary "(admin) delete current theater"
+                     :description "Only admins have permission to delete a theater."
+                     :middleware [mw/token-valid mw/not-expired [mw/roles "admin"]]
                      :handler theaters/delete-theater}}]])
 
 (def user-routes
-  ["/users" {:middleware [mw/auth mw/admin]
+  ["/users" {:middleware [mw/token-valid mw/not-expired [mw/roles "admin"]]
              :parameters {:header {(s/optional-key :authorization) s/Str}}
              :swagger {:tags ["users"]}}
-   ["" {:get users/get-users
-        :post {:parameters {:body {:fullname s/Str
+   ["" {:get {:summary "(admin) get all users"
+              :handler (persons/get-persons "user")}
+        :post {:summary "(admin) create a new user"
+               :parameters {:body {:fullname s/Str
                                    :dob s/Str
                                    :username s/Str
                                    :password s/Str
                                    :mail s/Str}}
                :middleware [mw/create-user]
-               :handler users/create-user}}]
+               :handler (persons/create-person "user")}}]
    ["/:id" {:parameters {:path {:id s/Int}}
-            :get users/get-user-by-id
-            :put {:parameters {:body {:fullname s/Str
-                                      :dob s/Str
-                                      :username s/Str
-                                      :password s/Str
-                                      :mail s/Str}}
-                  :handler users/update-user}
-            :delete users/delete-user}]])
+            :get {:summary "(admin) get a specific user account"
+                  :handler (persons/get-person-by-id "user")}
+            :put {:summary "(admin) update a user account"
+                  :description "You can provide all or some pairs of key:value. The missing keys will keep their old value."
+                  :parameters {:body {(s/optional-key :fullname) s/Str
+                                      (s/optional-key :dob) s/Str
+                                      (s/optional-key :username) s/Str
+                                      (s/optional-key :password) s/Str
+                                      (s/optional-key :mail) s/Str}}
+                  :handler (persons/update-person "user")}
+            :delete {:summary "delete a user account"
+                     :handler (persons/delete-person "user")}}]])
+
+(def manager-routes
+  ["/managers" {:middleware [mw/token-valid mw/not-expired [mw/roles "admin"]]
+                :parameters {:header {(s/optional-key :authorization) s/Str}}
+                :swagger {:tags ["managers"]}}
+   ["" {:get {:summary "(admin) get all managers"
+              :handler (persons/get-persons "manager")}
+        :post {:summary "(admin) create a new manager"
+               :parameters {:body {:mail s/Str
+                                   :password s/Str}}
+               :middleware [mw/create-manager]
+               :handler (persons/create-person "manager")}}]
+   ["/:id" {:parameters {:path {:id s/Int}}
+            :get {:summary "(admin) get a specific manager account"
+                  :handler (persons/get-person-by-id "manager")}
+            :put {:summary "(admin) update a manager account"
+                  :description "You can provide all or some pairs of key:value. The missing keys will keep their old value."
+                  :parameters {:body {(s/optional-key :mail) s/Str
+                                      (s/optional-key :password) s/Str}}
+                  :handler (persons/update-person "manager")}
+            :delete {:summary "delete a manager account"
+                     :handler (persons/delete-person "manager")}}]])
+
+(def admin-routes
+  ["/admins" {:middleware [mw/token-valid mw/not-expired [mw/roles "admin"]]
+              :parameters {:header {(s/optional-key :authorization) s/Str}}
+              :swagger {:tags ["admins"]}}
+   ["" {:get {:summary "(admin) get all admins"
+              :handler (persons/get-persons "admin")}
+        :post {:summary "(admin) create a new admin"
+               :parameters {:body {:mail s/Str
+                                   :password s/Str}}
+               :middleware [mw/create-admin]
+               :handler (persons/create-person "admin")}}]
+   ["/:id" {:parameters {:path {:id s/Int}}
+            :get {:summary "(admin) get a specific admin account"
+                  :handler (persons/get-person-by-id "admin")}
+            :put {:summary "(admin) update a admin account"
+                  :description "You can provide all or some pairs of key:value. The missing keys will keep their old value."
+                  :parameters {:body {(s/optional-key :mail) s/Str
+                                      (s/optional-key :password) s/Str}}
+                  :handler (persons/update-person "admin")}
+            :delete {:summary "delete a admin account"
+                     :handler (persons/delete-person "admin")}}]])
 
 (def ticket-routes
   ["/tickets" {:swagger {:tags ["tickets"]}
@@ -157,10 +215,11 @@
 
 (def logout ["/logout" {:swagger {:tags ["auth"]}
                         :parameters {:header {(s/optional-key :authorization) s/Str}}
-                        :middleware [mw/token-valid mw/not-expired]}
+                        :middleware [mw/token-valid]}
              ["" {:summary "logout & revoke current being used pair of tokens"
                   :post auth/logout}]
              ["/other-devices" {:summary "revoke all other pairs of tokens bound to current user except the one being used"
+                                :middleware [mw/not-expired]
                                 :post auth/logout-from-other-devices}]])
 
 (def register ["/register" {:swagger {:tags ["auth"]}
