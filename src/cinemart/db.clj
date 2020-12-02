@@ -20,6 +20,13 @@
 
 (hugsql/def-db-fns "sql/users.sql")
 (create-users-table config)
+;; create john@doe.com:password if not exists
+(when (not (get-user-by-mail config {:mail "john@doe.com"}))
+  (insert-user config {:fullname "John Doe"
+                       :username "johndoe"
+                       :mail "john@doe.com"
+                       :password "password"
+                       :dob "1/1/1970"}))
 
 (hugsql/def-db-fns "sql/invoices.sql")
 (create-invoices-table config)
@@ -36,7 +43,7 @@
 (hugsql/def-db-fns "sql/admins.sql")
 (create-admins-table config)
 ;; add admin if no admin exists
-(if (= 0 (:count (count-admins config)))
+(when (not (get-admin-by-mail config {:mail "admin@cinemart.com"}))
   (insert-admin config {:mail "admin@cinemart.com"
                         :password (h/derive "admin")}))
 

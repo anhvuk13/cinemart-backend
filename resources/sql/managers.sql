@@ -27,7 +27,7 @@ WHERE mail = :mail;
 -- :name insert-manager :? :1
 INSERT INTO managers (password, mail)
 VALUES (:password, :mail)
-RETURNING id;
+RETURNING *;
 
 -- :name update-manager-by-id :! :1
 UPDATE managers

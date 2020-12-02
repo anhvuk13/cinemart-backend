@@ -24,7 +24,11 @@
 
 (defn create-manager [next]
   (fn [req]
-    (create-person req next db/get-manager-by-mail)))
+    (if (not (db/get-theater-by-id
+              db/config
+              {:id (get-in req [:parameters :body :theater])}))
+      (res/bad-request {:error "theater not exists"})
+      (create-person req next db/get-manager-by-mail))))
 
 (defn create-admin [next]
   (fn [req]
@@ -73,7 +77,7 @@
 
 (defn managing? [next]
   (fn [req]
-    (if (and ((get-in req [:info :role]) "manager")
+    (if (and (= (get-in req [:info :role]) "manager")
              (empty?
               (db/check-management-exists
                db/config

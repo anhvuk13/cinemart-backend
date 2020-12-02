@@ -13,7 +13,6 @@
   (let [data (:body parameters)
         user (-> data
                  ((partial db/insert-user db/config))
-                 ((partial db/get-user-by-id db/config))
                  (s/add-token role))]
     (res/created
      (str "/user/" (:id user))
@@ -22,14 +21,14 @@
 (defn login [{:keys [parameters]} role]
   (let [mail (get-in parameters [:body :mail])
         [get-db] (s/mail-get-func-by-role role)
-        user (get-db db/config {:mail mail})
+        account (get-db db/config {:mail mail})
         password (get-in parameters [:body :password])]
-    (if user
-      (if (try (s/checkpass password user)
+    (if account
+      (if (try (s/checkpass password account)
                (catch Exception e false))
-        (res/ok {:user (s/add-token user role)})
+        (res/ok {(keyword role) (s/add-token account role)})
         (res/unauthorized {:error "Wrong password"}))
-      (res/not-found {:error "User not found"}))))
+      (res/not-found {:error (str role " not found")}))))
 
 ;; log out from other device and clean dead tokens
 (defn logout-from-other-devices [{:keys [token info]}]

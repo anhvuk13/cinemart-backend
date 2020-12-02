@@ -5,7 +5,7 @@
 CREATE TABLE IF NOT EXISTS theaters (
   id SERIAL PRIMARY KEY,
   name TEXT NOT NULL,
-  address TEXT NOT NULL,
+  address TEXT NOT NULL UNIQUE,
   created_at TIMESTAMP NOT NULL DEFAULT current_timestamp
 );
 
@@ -23,7 +23,7 @@ WHERE id = :id;
 -- :name insert-theater :? :1
 INSERT INTO theaters (name, address)
 VALUES (:name, :address)
-RETURNING id;
+RETURNING *;
 
 -- :name update-theater-by-id :! :1
 UPDATE theaters

@@ -16,11 +16,22 @@
           account (-> data
                       (s/hashpass)
                       ((partial insert-db db/config))
-                      ((partial get-db db/config))
-                      (dissoc :password))]
+                      (dissoc :password))
+          management (if (= role "manager")
+                       {:management
+                        (db/insert-management db/config
+                                              {:theater (get-in parameters [:body :theater])
+                                               :manager (:id account)})}
+                       nil)]
       (res/created
        (str "/" role "/" (:id account))
-       {:inserted account}))))
+       (merge {(keyword role) account} management)))))
+
+(comment
+  ((create-person "manager")
+   {:parameters {:body {:theater 5
+                                      :mail "alohihi"
+                                      :password "string"}}}))
 
 (defn get-person-by-id [role]
   (fn [{:keys [parameters]}]
@@ -43,7 +54,7 @@
           (s/revoke-all-tokens id role [])
           (res/ok {:updated true
                    :before-updated old-data
-                   :after-updated (get-db db/config id)}))
+                   :after-updated account}))
         (res/not-found
          {:updated false
           :error (str "unable to update " role)})))))

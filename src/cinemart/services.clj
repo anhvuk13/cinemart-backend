@@ -5,8 +5,8 @@
 (import java.util.Date)
 
 (defonce secret "secret")
-(defonce token-valid 120)
-(defonce ref-token-valid 300)
+(defonce token-valid 1800)
+(defonce ref-token-valid 3600)
 
 (defn now []
   (* (.getTime (java.util.Date.))))

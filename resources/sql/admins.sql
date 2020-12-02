@@ -30,7 +30,7 @@ WHERE mail = :mail;
 -- :name insert-admin :? :1
 INSERT INTO admins (password, mail)
 VALUES (:password, :mail)
-RETURNING id;
+RETURNING *;
 
 -- :name update-admin-by-id :! :1
 UPDATE admins

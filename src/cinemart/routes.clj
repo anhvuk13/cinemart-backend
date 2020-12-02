@@ -54,10 +54,13 @@
   ["/theaters" {:swagger {:tags ["theaters"]}}
    ["" {:get {:summary "show all theater"
               :handler theaters/get-theaters}
-        :post {:summary "(admin) create a new theater"
+        :post {:summary "(admin) create a new theater and its manager"
                :description "Only admins take responsibility to create a theater."
-               :parameters {:body {:name s/Str
-                                   :address s/Str}}
+               :parameters {:header {(s/optional-key :authorization) s/Str}
+                            :body {:theater {:name s/Str
+                                             :address s/Str}
+                                   :manager {:mail s/Str
+                                             :password s/Str}}}
                :middleware [mw/token-valid mw/not-expired [mw/roles "admin"]]
                :handler theaters/create-theater}}]
    ["/:id" {:parameters {:path {:id s/Int}}
@@ -66,11 +69,13 @@
             :put {:summary "(admin|manager) update theater's info"
                   :description "Managers who manage the current theater or any admins can update this theater info."
                   :middleware [mw/token-valid mw/not-expired [mw/roles "admin" "manager"] mw/managing?]
-                  :parameters {:body {:name s/Str
-                                      :address s/Str}}
+                  :parameters {:header {(s/optional-key :authorization) s/Str}
+                               :body {(s/optional-key :name) s/Str
+                                      (s/optional-key :address) s/Str}}
                   :handler theaters/update-theater}
             :delete {:summary "(admin) delete current theater"
                      :description "Only admins have permission to delete a theater."
+                     :parameters {:header {(s/optional-key :authorization) s/Str}}
                      :middleware [mw/token-valid mw/not-expired [mw/roles "admin"]]
                      :handler theaters/delete-theater}}]])
 
@@ -109,7 +114,8 @@
    ["" {:get {:summary "(admin) get all managers"
               :handler (persons/get-persons "manager")}
         :post {:summary "(admin) create a new manager"
-               :parameters {:body {:mail s/Str
+               :parameters {:body {:theater s/Int
+                                   :mail s/Str
                                    :password s/Str}}
                :middleware [mw/create-manager]
                :handler (persons/create-person "manager")}}]

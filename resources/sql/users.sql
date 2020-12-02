@@ -30,7 +30,7 @@ WHERE mail = :mail;
 -- :name insert-user :? :1
 INSERT INTO users (fullname, dob, username, password, mail)
 VALUES (:fullname, :dob, :username, :password, :mail)
-RETURNING id;
+RETURNING *;
 
 -- :name update-user-by-id :! :1
 UPDATE users
