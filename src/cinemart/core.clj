@@ -36,13 +36,13 @@
      r/logout
      r/refresh-token
      r/me-routes
-     r/ping-routes
      r/theater-routes
      r/user-routes
      r/manager-routes
      r/admin-routes
      r/schedule-routes
-     r/ticket-routes]
+     r/ticket-routes
+     r/ping-routes]
     {:data {:coercion reitit.coercion.schema/coercion
             :muuntaja m/instance
             :middleware [[wrap-cors
