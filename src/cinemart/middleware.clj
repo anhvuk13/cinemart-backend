@@ -15,7 +15,7 @@
 (defn create-person [req next get-by-mail]
   (let [mail (get-in req [:parameters :body :mail])]
     (if (get-by-mail db/config {:mail mail})
-      (res/bad-request {:error "Mail is already used"})
+      (res/bad-request {:error "mail is already used"})
       (next req))))
 
 (defn create-user [next]
@@ -43,8 +43,8 @@
     (if token
       (if (get-auth db/config {key token})
         (next (assoc req :token token :info info))
-        (res/unauthorized {:error "Token invalid"}))
-      (res/unauthorized {:error "Token required"}))))
+        (res/unauthorized {:error "token invalid"}))
+      (res/unauthorized {:error "token required"}))))
 
 (defn token-valid [next]
   (fn [req]
@@ -64,7 +64,7 @@
       (next req)
       (do (when (:refresh-token req)
             (db/delete-auth-by-refresh-token db/config {:refresh-token (:token req)}))
-          (res/unauthorized {:error "Token expired"})))))
+          (res/unauthorized {:error "token expired"})))))
 
 (defn roles [next & r]
   (fn [req]
@@ -83,7 +83,7 @@
                db/config
                {:theater (get-in req [:parameters :path :id])
                 :manager (get-in req [:info :id])})))
-      (res/unauthorized {:error "You're not in charge of managing this theater"})
+      (res/unauthorized {:error "you're not in charge of managing this theater"})
       (next req))))
 
 (comment
@@ -96,8 +96,8 @@
   (if (valid? req)
     (if-let [role (not-expired? req)]
       (next (assoc req :role role))
-      (res/unauthorized {:error "Token expired"}))
-    (res/unauthorized {:error "Token invalid"})))
+      (res/unauthorized {:error "token expired"}))
+    (res/unauthorized {:error "token invalid"})))
 
 (defn auth [next]
   (fn [req]
@@ -111,19 +111,19 @@
   (fn [req]
     (if (= (:role req) "admin")
       (next req)
-      (res/unauthorized {:error "Admin place"}))))
+      (res/unauthorized {:error "admin place"}))))
 
 (defn manager-or-admin [next]
   (fn [req]
     (if (or (= (:role req) "admin") (= (:role req) "manager"))
       (next req)
-      (res/unauthorized {:error "Manager & Admin place"}))))
+      (res/unauthorized {:error "manager & admin place"}))))
 
 (defn manager [next]
   (fn [req]
     (if (= (:role req) "manager")
       (next req)
-      (res/unauthorized {:error "Manager place"}))))
+      (res/unauthorized {:error "manager place"}))))
 
 (comment
   ((reauthenticate auth/refresh) {:headers {"authorization" "eyJhbGciOiJIUzI1NiJ9.eyJhZG1pbiI6ZmFsc2UsInBhc3N3b3JkIjoiYmNyeXB0K3NoYTUxMiQyOWEyYmZlYWE2NjMzNzA0ODdlMjNkNTNiYTRmMmQxYSQxMiRjNWQzOTIxNTY3ZWIwNGIyNTVlNjE5Nzk5NzYxYzAyM2FkNzhjNzExNzIyY2JiMzgiLCJtYWlsIjoibXJAZG9lIiwiZXhwIjoxNjA1NDI0NjE3ODk3LCJ1c2VybmFtZSI6Im1yZG9lIiwiZnVsbG5hbWUiOiJNciBEb2UiLCJkb2IiOiIxLTMtMTk2MCIsImlkIjoxNywiY3JlYXRlZF9hdCI6MTYwNTM3NDcyNn0.2gcdR-b9kGFrs-R7EVzdaIYEWdPFK7AjUwcdtViHKcE"}}))

@@ -6,7 +6,7 @@
 (defn refresh [{:keys [token info]}]
   (db/delete-auth-by-refresh-token db/config
                                    {:refresh-token token})
-  (res/ok {:user
+  (res/ok {:response
            (s/add-token info (:role info))}))
 
 (defn register [{:keys [parameters]}, role]
@@ -16,7 +16,7 @@
                  (s/add-token role))]
     (res/created
      (str "/user/" (:id user))
-     {:user user})))
+     {:response user})))
 
 (defn login [{:keys [parameters]} role]
   (let [mail (get-in parameters [:body :mail])
@@ -26,7 +26,7 @@
     (if account
       (if (try (s/checkpass password account)
                (catch Exception e false))
-        (res/ok {(keyword role) (s/add-token account role)})
+        (res/ok {:response (s/add-token account role)})
         (res/unauthorized {:error "wrong password"}))
       (res/not-found {:error (str role " not found")}))))
 
@@ -45,7 +45,7 @@
    [(fn [t]
       (or (s/token-dead? (:refresh_token t))
           (= token (:token t))))])
-  (res/ok {:info (dissoc info :password :exp :expire)
+  (res/ok {:response (dissoc info :password :exp :expire)
            :message "logged out"}))
 
 ;; tests

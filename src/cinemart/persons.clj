@@ -6,7 +6,7 @@
 (defn get-persons [role]
   (fn [req]
     (let [[get-db-many] (s/get-many-func-by-role role)]
-      (res/ok {(keyword (str role "s")) (get-db-many db/config)}))))
+      (res/ok {:response (get-db-many db/config)}))))
 
 (defn create-person [role]
   (fn [{:keys [parameters]}]
@@ -25,13 +25,16 @@
                        nil)]
       (res/created
        (str "/" role "/" (:id account))
-       (merge {(keyword role) account} management)))))
+       (if management
+         {:response {:manager account
+                     :management management}}
+         {:response account})))))
 
 (comment
   ((create-person "manager")
    {:parameters {:body {:theater 5
-                                      :mail "alohihi"
-                                      :password "string"}}}))
+                        :mail "alohihi"
+                        :password "string"}}}))
 
 (defn get-person-by-id [role]
   (fn [{:keys [parameters]}]
@@ -39,7 +42,7 @@
           [get-db _ _] (s/get-func-by-role role)
           account (get-db db/config id)]
       (if account
-        (res/ok {(keyword role) account})
+        (res/ok {:response account})
         (res/not-found {:error (str role " not found")})))))
 
 (defn update-person [role]
@@ -53,8 +56,8 @@
         (do
           (s/revoke-all-tokens id role [])
           (res/ok {:updated true
-                   :before-updated old-data
-                   :after-updated account}))
+                   :response {:before-updated old-data
+                              :after-updated account}}))
         (res/not-found
          {:updated false
           :error (str "unable to update " role)})))))
@@ -68,7 +71,7 @@
       (if (= 1 deleted-count)
         (res/ok
          {:deleted true
-          :before-deleted before-deleted})
+          :response {:before-deleted before-deleted}})
         (res/not-found
          {:deleted false
           :error (str "unable to delete " role)})))))

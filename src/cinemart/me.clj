@@ -4,7 +4,7 @@
             [cinemart.services :as s]))
 
 (defn get-my-info [{:keys [info]}]
-  (res/ok {:me (dissoc info :exp :expire :password)}))
+  (res/ok {:response (dissoc info :exp :expire :password)}))
 
 (defn update-my-info [req]
   (let [token (:token req)
@@ -18,7 +18,7 @@
     (if (= 1 updated-count)
       (s/revoke-all-tokens id role)
       (res/ok {:updated true
-               :me (s/add-token updated-data role)}))
+               :response (s/add-token updated-data role)}))
     (res/not-found {:updated false
                     :error (str "Unable to update " role)})))
 
@@ -30,7 +30,7 @@
     (delete-db db/config {:id id})
     (db/delete-auth-by-token db/config {:token token})
     (res/ok {:message "deleted"
-             :account account})))
+             :response account})))
 
 (comment
   (def req
