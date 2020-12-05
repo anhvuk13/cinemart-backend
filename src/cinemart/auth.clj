@@ -34,18 +34,15 @@
 (defn logout-from-other-devices [{:keys [token info]}]
   (s/revoke-all-tokens
    (:id info) (:role info)
-   [(fn [t]
-      (not= token (:token t)))])
+   [(fn [t] (not= token (:token t)))])
   (res/ok {:message "logged out from all other devices"}))
 
 ;; log out and clean dead tokens
 (defn logout [{:keys [token info]}]
   (s/revoke-all-tokens
    (:id info) (:role info)
-   [(fn [t]
-      (or (s/token-dead? (:refresh_token t))
-          (= token (:token t))))])
-  (res/ok {:response (dissoc info :password :exp :expire)
+   [(fn [t] (= token (:token t)))])
+  (res/ok {:response (dissoc info :password :expire)
            :message "logged out"}))
 
 ;; tests

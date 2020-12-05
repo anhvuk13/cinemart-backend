@@ -5,8 +5,8 @@
 (import java.util.Date)
 
 (defonce secret "secret")
-(defonce token-valid 1800)
-(defonce ref-token-valid 3600)
+(defonce token-valid 60)
+(defonce ref-token-valid 70)
 
 (defn now []
   (* (.getTime (java.util.Date.))))
@@ -18,7 +18,7 @@
   (+ (now) (* 1000 ref-token-valid)))
 
 (defn create-token [user exp]
-  (jwt/sign (assoc user :expire exp) secret {:exp (inc exp)}))
+  (jwt/sign (assoc user :expire exp) secret))
 
 (defn decreate-token [token]
   (try
@@ -33,7 +33,7 @@
     (db/insert-auth db/config
                     {:token (:token user)
                      :refresh-token (:refresh-token user)})
-    (dissoc user :exp :expire :password)))
+    (dissoc user :expire :password)))
 
 (defn hashpass [user]
   (assoc user :password (h/derive (:password user))))
@@ -61,7 +61,7 @@
 (defn token-alive? [token]
   (let [t (decreate-token token)]
     (and (boolean t)
-         (< (now) (:expire (decreate-token token))))))
+         (< (now) (:expire t)))))
 
 (defn token-dead? [token]
   (not (token-alive? token)))
@@ -89,6 +89,7 @@
           info-id (:id info)
           info-role (:role info)]
       (if (or (not info)
+              (>= (now) (:expire info))
               (and (= id info-id)
                    (= role info-role)
                    (reduce
@@ -121,4 +122,5 @@
     "manager" [db/get-manager-by-id db/update-manager-by-id db/delete-manager-by-id]
     [db/get-user-by-id db/update-user-by-id db/delete-user-by-id]))
 
-(comment)
+(comment
+  (decreate-token "eyJhbGciOiJIUzI1NiJ9.eyJyb2xlIjoidXNlciIsInBhc3N3b3JkIjoiYmNyeXB0K3NoYTUxMiQ5MGJmNTQwMGU0ODdkNjcyMWE3ZTBmZmUxZWQxN2FlNCQxMiQ3NDQxYzFmZGVmNDZlZjFhZGRlZTdmYWZiZWRhMWU1OGVlODI1N2I0OGM4YTRjNDEiLCJtYWlsIjoic3RyaW5nIiwidXNlcm5hbWUiOiJzdHJpbmciLCJmdWxsbmFtZSI6InN0cmluZyIsImV4cGlyZSI6MTYwNzE1NTk4OTUwOCwiZG9iIjoiMS8yLzExOTMiLCJpZCI6MzIsImNyZWF0ZWRfYXQiOjE2MDY4OTQ3OTl9.BbtIR2K9ETYKnPUk4SuT2DcZS0Gf1teriykTwBa5NMQ"))

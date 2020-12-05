@@ -221,10 +221,11 @@
 
 (def logout ["/logout" {:swagger {:tags ["auth"]}
                         :parameters {:header {(s/optional-key :authorization) s/Str}}
-                        :middleware [mw/token-valid mw/not-expired]}
+                        :middleware [mw/token-valid]}
              ["" {:summary "logout & revoke current being used pair of tokens"
                   :post auth/logout}]
              ["/other-devices" {:summary "revoke all other pairs of tokens bound to current user except the one being used"
+                                :middleware [mw/not-expired]
                                 :post auth/logout-from-other-devices}]])
 
 (def register ["/register" {:swagger {:tags ["auth"]}

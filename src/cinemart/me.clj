@@ -16,11 +16,12 @@
         updated-data (merge me update-data)
         updated-count (update-db db/config updated-data)]
     (if (= 1 updated-count)
-      (s/revoke-all-tokens id role)
-      (res/ok {:updated true
-               :response (s/add-token updated-data role)}))
-    (res/not-found {:updated false
-                    :error (str "Unable to update " role)})))
+      (do
+        (s/revoke-all-tokens id role [])
+        (res/ok {:updated true
+                 :response (s/add-token updated-data role)}))
+      (res/not-found {:updated false
+                      :error (str "Unable to update " role)}))))
 
 (defn delete-my-account [{:keys [token info]}]
   (let [id (:id info)
