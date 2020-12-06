@@ -16,6 +16,9 @@ DROP TABLE IF EXISTS managers;
 -- :name get-managers :? :*
 SELECT * FROM managers;
 
+-- :name get-managers-without-pass :? :*
+SELECT id, mail, created_at FROM managers;
+
 -- :name get-manager-by-id :? :1
 SELECT * FROM managers
 WHERE id = :id;

@@ -19,6 +19,9 @@ DROP TABLE IF EXISTS users;
 -- :name get-users :? :*
 SELECT * FROM users;
 
+-- :name get-users-without-pass :? :*
+SELECT id, fullname, dob, username, mail, created_at FROM users;
+
 -- :name get-user-by-id :? :1
 SELECT * FROM users
 WHERE id = :id;

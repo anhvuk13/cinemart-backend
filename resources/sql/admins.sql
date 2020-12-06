@@ -16,6 +16,9 @@ DROP TABLE IF EXISTS admins;
 -- :name get-admins :? :*
 SELECT * FROM admins;
 
+-- :name get-admins-without-pass :? :*
+SELECT id, mail, created_at FROM admins;
+
 -- :name count-admins :? :1
 SELECT COUNT(*) FROM admins;
 
