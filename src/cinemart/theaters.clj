@@ -1,5 +1,6 @@
 (ns cinemart.theaters
-  (:require [cinemart.db :as db]
+  (:require [buddy.hashers :as h]
+            [cinemart.db :as db]
             [ring.util.http-response :as res]))
 
 (defn get-theaters
@@ -16,11 +17,15 @@
 
 (defn create-theater [{:keys [parameters]}]
   (let [theater-info (get-in parameters [:body :theater])
-        manager-info (get-in parameters [:body :manager])]
+        temp (get-in parameters [:body :manager])
+        manager-info (assoc temp :password (h/derive (:password temp)))]
     (if (db/get-manager-by-mail db/config manager-info)
       (res/bad-request {:error "manager mail is used already"})
       (let [theater (db/insert-theater db/config theater-info)
-            manager (db/insert-manager db/config manager-info)
+            manager (->
+                      (db/insert-manager db/config manager-info)
+                      (assoc :theater_name (:name theater))
+                      (dissoc :password))
             management (db/insert-management db/config
                                              {:theater (:id theater)
                                               :manager (:id manager)})]
@@ -48,7 +53,7 @@
     (if (= 1 updated-count)
       (res/ok {:updated true
                :response {:before-updated old-data
-                          :after-deleted theater}})
+                          :after-updated theater}})
       (res/not-found
        {:updated false
         :error "Unable to update theater"}))))

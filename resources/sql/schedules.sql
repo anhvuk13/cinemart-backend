@@ -36,7 +36,7 @@ WHERE id = :id;
 -- :name insert-schedule :? :1
 INSERT INTO schedules (movie, theater, room, seats, time)
 VALUES (:movie, :theater, :room, :seats, :time)
-RETURNING id;
+RETURNING *;
 
 -- :name update-schedule-by-id :! :1
 UPDATE schedules

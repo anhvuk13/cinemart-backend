@@ -11,7 +11,9 @@
             [cinemart.theaters :as theaters]
             [cinemart.tickets :as tickets]))
 
-(def Bool (s/enum "true" "True" "false" "False"))
+(def StrInt (s/pred (fn [req]
+                      (try (Integer/parseInt req)
+                           (catch Exception e false)))))
 
 (defn ping-handler [req]
   (res/ok {:ping "pong"}))
@@ -63,21 +65,24 @@
                                              :password s/Str}}}
                :middleware [mw/token-valid mw/not-expired [mw/roles "admin"]]
                :handler theaters/create-theater}}]
-   ["/:id" {:parameters {:path {:id s/Int}}
-            :get {:summary "get details of a specific theater"
-                  :handler theaters/get-theater-by-id}
-            :put {:summary "(admin|manager) update theater's info"
-                  :description "Managers who manage the current theater or any admins can update this theater info."
-                  :middleware [mw/token-valid mw/not-expired [mw/roles "admin" "manager"] mw/managing?]
-                  :parameters {:header {(s/optional-key :authorization) s/Str}
-                               :body {(s/optional-key :name) s/Str
-                                      (s/optional-key :address) s/Str}}
-                  :handler theaters/update-theater}
-            :delete {:summary "(admin) delete current theater"
-                     :description "Only admins have permission to delete a theater."
-                     :parameters {:header {(s/optional-key :authorization) s/Str}}
-                     :middleware [mw/token-valid mw/not-expired [mw/roles "admin"]]
-                     :handler theaters/delete-theater}}]])
+   ["/:id" {:parameters {:path {:id s/Int}}}
+    ["" {:get {:summary "get details of a specific theater"
+               :handler theaters/get-theater-by-id}
+         :put {:summary "(admin|manager) update theater's info"
+               :description "Managers who manage the current theater or any admins can update this theater info."
+               :middleware [mw/token-valid mw/not-expired [mw/roles "admin" "manager"] mw/managing?]
+               :parameters {:header {(s/optional-key :authorization) s/Str}
+                            :body {(s/optional-key :name) s/Str
+                                   (s/optional-key :address) s/Str}}
+               :handler theaters/update-theater}
+         :delete {:summary "(admin) delete current theater"
+                  :description "Only admins have permission to delete a theater."
+                  :parameters {:header {(s/optional-key :authorization) s/Str}}
+                  :middleware [mw/token-valid mw/not-expired [mw/roles "admin"]]
+                  :handler theaters/delete-theater}}]
+    ["/schedules" {:get (fn [req]
+                          (res/ok {:response (:parameters req)
+                                   :header (:header (:parameters req))}))}]]])
 
 (def user-routes
   ["/users" {:middleware [mw/token-valid mw/not-expired [mw/roles "admin"]]
@@ -103,6 +108,7 @@
                                       (s/optional-key :username) s/Str
                                       (s/optional-key :password) s/Str
                                       (s/optional-key :mail) s/Str}}
+                  :middleware [mw/hashpass]
                   :handler (persons/update-person "user")}
             :delete {:summary "delete a user account"
                      :handler (persons/delete-person "user")}}]])
@@ -114,11 +120,11 @@
    ["" {:get {:summary "(admin) get all managers"
               :handler (persons/get-persons "manager")}
         :post {:summary "(admin) create a new manager"
-               :parameters {:body {:theater s/Int
+               :parameters {:body {:theater s/Str
                                    :mail s/Str
                                    :password s/Str}}
-               :middleware [mw/create-manager]
-               :handler (persons/create-person "manager")}}]
+               :middleware [[mw/StrInt? :theater] mw/create-manager]
+               :handler persons/create-manager}}]
    ["/:id" {:parameters {:path {:id s/Int}}
             :get {:summary "(admin) get a specific manager account"
                   :handler (persons/get-person-by-id "manager")}
@@ -126,6 +132,7 @@
                   :description "You can provide all or some pairs of key:value. The missing keys will keep their old value."
                   :parameters {:body {(s/optional-key :mail) s/Str
                                       (s/optional-key :password) s/Str}}
+                  :middleware [mw/hashpass]
                   :handler (persons/update-person "manager")}
             :delete {:summary "delete a manager account"
                      :handler (persons/delete-person "manager")}}]])
@@ -148,6 +155,7 @@
                   :description "You can provide all or some pairs of key:value. The missing keys will keep their old value."
                   :parameters {:body {(s/optional-key :mail) s/Str
                                       (s/optional-key :password) s/Str}}
+                  :middleware [mw/hashpass]
                   :handler (persons/update-person "admin")}
             :delete {:summary "delete a admin account"
                      :handler (persons/delete-person "admin")}}]])

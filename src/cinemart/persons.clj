@@ -10,25 +10,15 @@
 
 (defn create-person [role]
   (fn [{:keys [parameters]}]
-    (let [[get-db _ _] (s/get-func-by-role role)
-          [insert-db] (s/insert-func-by-role role)
+    (let [[insert-db] (s/insert-func-by-role role)
           data (:body parameters)
           account (-> data
                       (s/hashpass)
                       ((partial insert-db db/config))
-                      (dissoc :password))
-          management (if (= role "manager")
-                       {:management
-                        (db/insert-management db/config
-                                              {:theater (get-in parameters [:body :theater])
-                                               :manager (:id account)})}
-                       nil)]
+                      (dissoc :password))]
       (res/created
-       (str "/" role "/" (:id account))
-       (if management
-         {:response {:manager account
-                     :management management}}
-         {:response account})))))
+        (str "/" role "s/" (:id account))
+        {:response account}))))
 
 (comment
   ((create-person "manager")
@@ -75,3 +65,18 @@
         (res/not-found
          {:deleted false
           :error (str "unable to delete " role)})))))
+
+(defn create-manager [{:keys [parameters]}]
+  (let [data (:body parameters)
+        account (-> data
+                    (s/hashpass)
+                    ((partial db/insert-manager db/config))
+                    (dissoc :password))
+        management {:management
+                    (db/insert-management db/config
+                                          {:theater (:theater data)
+                                           :manager (:id account)})}]
+    (res/created
+      (str "/managers/" (:id account))
+      {:response {:manager account
+                  :management management}})))

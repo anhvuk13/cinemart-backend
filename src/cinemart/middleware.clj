@@ -24,11 +24,11 @@
 
 (defn create-manager [next]
   (fn [req]
-    (if (not (db/get-theater-by-id
-              db/config
-              {:id (get-in req [:parameters :body :theater])}))
-      (res/bad-request {:error "theater not exists"})
-      (create-person req next db/get-manager-by-mail))))
+    (let [id (get-in req [:parameters :body :theater])
+          nreq (assoc-in req [:parameters :body :theater] id)]
+      (if (not (db/get-theater-by-id db/config {:id id}))
+        (res/bad-request {:error "theater not exists"})
+        (create-person nreq next db/get-manager-by-mail)))))
 
 (defn create-admin [next]
   (fn [req]
@@ -85,6 +85,14 @@
                 :manager (get-in req [:info :id])})))
       (res/unauthorized {:error "you're not in charge of managing this theater"})
       (next req))))
+
+(defn StrInt? [next key]
+  (fn [req]
+    (let [val (get-in req [:parameters :body key])]
+      (try (next (assoc-in req [:parameters :body key] (Integer/parseInt val)))
+           (catch Exception e
+             (res/bad-request
+               {:error (str key " must be StrInt (ex: '1', '2',...)")}))))))
 
 (comment
   ((roles #(println %) "admin" "user" "manager") {:role "manager"})

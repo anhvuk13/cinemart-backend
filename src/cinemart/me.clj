@@ -4,7 +4,7 @@
             [cinemart.services :as s]))
 
 (defn get-my-info [{:keys [info]}]
-  (res/ok {:response (dissoc info :exp :expire :password)}))
+  (res/ok {:response (dissoc info :expire :password)}))
 
 (defn update-my-info [req]
   (let [token (:token req)

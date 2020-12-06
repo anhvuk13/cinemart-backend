@@ -88,4 +88,6 @@
   (app {:request-method :post
         :uri "/login"
         :body "{ \"mail\": \"john@doe\", \"password\": \"password\"}"})
+  (app {:request-method :get
+        :uri "/theaters/3/schedules"})
   (restart-server))

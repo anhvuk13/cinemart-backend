@@ -1,51 +1,41 @@
 (ns cinemart.schedules
-  (:require [cinemart.db :as db]))
+  (:require [ring.util.http-response :as res]
+            [cinemart.db :as db]))
 
-(defn get-schedules
-  [_]
+(defn get-schedules [_]
   {:status 200
    :body (db/get-schedules db/config)})
 
-(defn create-schedule
-  [{:keys [parameters]}]
+(defn create-schedule [{:keys [parameters]}]
   (let [data (:body parameters)
-        created-id (db/insert-schedule db/config data)]
-    {:status 201
-     :body (db/get-schedule-by-id db/config created-id)}))
+        schedule (db/insert-schedule db/config data)]
+    (res/created (str "/schedules/" (:id schedule))
+                 {:response schedule})))
 
-(defn get-schedule-by-id
-  [{:keys [parameters]}]
+(defn get-schedule-by-id [{:keys [parameters]}]
   (let [id (:path parameters)
         schedule (db/get-schedule-by-id db/config id)]
     (if schedule
-      {:status 200
-       :body schedule}
-      {:status 404
-       :body {:error "Schedule not found"}})))
+      (res/ok {:response schedule})
+      (res/not-found {:error "schedule not found"}))))
 
-(defn update-schedule
-  [{:keys [parameters]}]
-  (let [id (get-in parameters [:path :id])
+(defn update-schedule [{:keys [parameters]}]
+  (let [id (:path parameters)
         body (:body parameters)
-        data (assoc body :id id)
+        data (merge body id)
         updated-count (db/update-schedule-by-id db/config data)]
     (if (= 1 updated-count)
-      {:status 200
-       :body {:updated true
-              :schedule (db/get-schedule-by-id db/config {:id id})}}
-      {:status 404
-       :body {:updated false
-              :error "Unable to update schedule"}})))
+      (res/ok {:updated true
+               :response (db/get-schedule-by-id db/config id)})
+      (res/not-found {:updated false
+                      :error "unable to update schedule"}))))
 
-(defn delete-schedule
-  [{:keys [parameters]}]
+(defn delete-schedule [{:keys [parameters]}]
   (let [id (:path parameters)
         before-deleted (db/get-schedule-by-id db/config id)
         deleted-count (db/delete-schedule-by-id db/config id)]
     (if (= 1 deleted-count)
-      {:status 200
-       :body {:deleted true
-              :schedule before-deleted}}
-      {:status 404
-       :body {:deleted false
-              :error "Unable to delete schedule"}})))
+      (res/ok {:deleted true
+               :response before-deleted})
+      (res/not-found {:deleted false
+                      :error "unable to delete schedule"}))))

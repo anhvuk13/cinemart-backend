@@ -21,7 +21,7 @@
   (insert-user config {:fullname "John Doe"
                        :username "johndoe"
                        :mail "john@doe.com"
-                       :password (h/derive "password")
+                       :password (h/derive "john")
                        :dob "1/1/1970"}))
 
 (hugsql/def-db-fns "sql/invoices.sql")
