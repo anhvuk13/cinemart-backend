@@ -113,9 +113,9 @@
 
 (defn get-many-func-by-role [role]
   (case role
-    "admin" [db/get-admins-by-pass]
-    "manager" [db/get-managers-by-pass]
-    [db/get-users-by-pass]))
+    "admin" [db/get-admins-without-pass]
+    "manager" [db/get-managers-without-pass]
+    [db/get-users-without-pass]))
 
 (defn get-func-by-role [role]
   (case role
