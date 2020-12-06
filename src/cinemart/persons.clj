@@ -56,8 +56,8 @@
         (do
           (s/revoke-all-tokens id role [])
           (res/ok {:updated true
-                   :response {:before-updated old-data
-                              :after-updated account}}))
+                   :response {:before-updated (dissoc old-data :password)
+                              :after-updated (dissoc account :password)}}))
         (res/not-found
          {:updated false
           :error (str "unable to update " role)})))))
