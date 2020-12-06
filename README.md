@@ -4,6 +4,12 @@ Just a simple web server written in [Clojure](https://clojure.org/)
 
 ## Run
 
+- Download dependencies
+
+```bash
+clj -Spath
+```
+
 - Start web server
 
 ```bash
@@ -18,19 +24,31 @@ clj -M:repl
 
 ## Docker
 
-- Watch
+- Switch to web server
+
+```bash
+sed -i 's/\("-M:docker-repl"\|"-M:run"\)/"-M:run"/g' docker-compose.yml
+```
+
+- Switch to dev server
+
+```bash
+sed -i 's/\("-M:docker-repl"\|"-M:run"\)/"-M:docker-repl"/g' docker-compose.yml
+```
+
+- Run server
 
 ```bash
 docker-compose up
 ```
 
-- Detach
+- Run & Detach server
 
 ```bash
 docker-compose up -d
 ```
 
-- Remove
+- Shutdown server
 
 ```bash
 docker-compose down
