@@ -1,13 +1,9 @@
 (ns cinemart.db
-  (:require [hugsql.core :as hugsql]
+  (:require [cinemart.config :as c]
+            [hugsql.core :as hugsql]
             [buddy.hashers :as h]))
 
-(def config
-  {:classname "org.postgresql.Driver"
-   :subprotocol "postgresql"
-   :subname "//db:5432/cinemart"
-   :user "postgres"
-   :password "postgres"})
+(defonce config c/db-config)
 
 (hugsql/def-db-fns "sql/movies.sql")
 (create-movies-table config)

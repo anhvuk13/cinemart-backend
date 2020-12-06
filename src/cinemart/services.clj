@@ -1,12 +1,13 @@
 (ns cinemart.services
-  (:require [cinemart.db :as db]
+  (:require [cinemart.config :as c]
+            [cinemart.db :as db]
             [buddy.hashers :as h]
             [buddy.sign.jwt :as jwt]))
 (import java.util.Date)
 
-(defonce secret "secret")
-(defonce token-valid 60)
-(defonce ref-token-valid 70)
+(defonce secret c/secret)
+(defonce token-valid c/token-valid)
+(defonce ref-token-valid c/ref-token-valid)
 
 (defn now []
   (* (.getTime (java.util.Date.))))
