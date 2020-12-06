@@ -17,7 +17,10 @@ DROP TABLE IF EXISTS managers;
 SELECT * FROM managers;
 
 -- :name get-managers-without-pass :? :*
-SELECT id, mail, created_at FROM managers;
+SELECT mr.id, mail, mr.created_at, name, address
+FROM managers as mr
+inner join management as mt on mr.id = mt.manager
+inner join theater as t on mt.theater = t.id;
 
 -- :name get-manager-by-id :? :1
 SELECT * FROM managers
