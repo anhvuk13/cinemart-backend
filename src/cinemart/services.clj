@@ -26,15 +26,17 @@
     (jwt/unsign token secret)
     (catch Exception e nil)))
 
-(defn add-token [data role]
-  (let [info (assoc data :role role)
-        user (assoc info :token
-                    (create-token info (token-exp))
+(defn add-token [req data role]
+  (let [user-agent (get-in req [:headers "user-agent"])
+        user-info (assoc data :user-agent user-agent :role role)
+        info (dissoc user-info :password)
+        user (assoc info
+                    :token (create-token info (token-exp))
                     :refresh-token (create-token info (ref-token-exp)))]
     (db/insert-auth db/config
                     {:token (:token user)
                      :refresh-token (:refresh-token user)})
-    (dissoc user :expire :password)))
+    (dissoc user :user-agent :expire)))
 
 (defn hashpass [user]
   (assoc user :password (h/derive (:password user))))

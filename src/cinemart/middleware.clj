@@ -35,15 +35,17 @@
     (create-person req next db/get-admin-by-mail)))
 
 ;; check if token valid
-
 (defn basic-valid [req next get-auth key]
   (let [t (get-in req [:parameters :header :authorization])
         token (if (string? t) (last (split t #" ")) nil)
-        info (s/decreate-token token)]
+        info (s/decreate-token token)
+        user-agent (get-in req [:headers "user-agent"])]
     (if token
-      (if (get-auth db/config {key token})
-        (next (assoc req :token token :info info))
-        (res/unauthorized {:error "token invalid"}))
+      (if (empty? (get-auth db/config {key token}))
+        (res/unauthorized {:error "token invalid"})
+        (if (= user-agent (:user-agent info))
+          (next (assoc req :token token :info (dissoc info :user-agent)))
+          (res/unauthorized {:error "have you just stolen this token?"})))
       (res/unauthorized {:error "token required"}))))
 
 (defn token-valid [next]
@@ -61,7 +63,7 @@
   (fn [req]
     (if (and (:info req)
              (< (s/now) (get-in req [:info :expire])))
-      (next req)
+      (next (update-in req [:info] dissoc :expire))
       (do (when (:refresh-token req)
             (db/delete-auth-by-refresh-token db/config {:refresh-token (:token req)}))
           (res/unauthorized {:error "token expired"})))))
