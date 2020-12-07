@@ -79,3 +79,6 @@
     (res/created
       (str "/managers/" (:id account))
       {:response (assoc account :theater_name theater_name)})))
+
+(defn get-managers-by-theater [{:keys [parameters]}]
+  (res/ok {:response (db/get-managers-by-theater db/config (:body parameters))}))

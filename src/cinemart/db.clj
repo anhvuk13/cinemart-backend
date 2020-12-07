@@ -46,4 +46,5 @@
 (hugsql/def-db-fns "sql/auth.sql")
 (create-auth-table config)
 
-(comment)
+(comment
+  (get-managers-by-theater config {:theater 1}))

@@ -23,6 +23,13 @@ FROM managers as mr
 inner join management as mt on mr.id = mt.manager
 inner join theaters as t on mt.theater = t.id;
 
+-- :name get-managers-by-theater :? :*
+SELECT mr.id, mr.mail, mr.created_at
+FROM managers as mr
+inner join management as mt on mr.id = mt.manager
+inner join theaters as t on mt.theater = t.id
+WHERE t.id = :theater;
+
 -- :name get-manager-by-id :? :1
 SELECT * FROM managers
 WHERE id = :id;

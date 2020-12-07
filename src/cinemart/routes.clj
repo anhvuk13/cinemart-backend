@@ -80,10 +80,19 @@
                   :parameters {:header {(s/optional-key :authorization) s/Str}}
                   :middleware [mw/token-valid mw/not-expired [mw/roles "admin"]]
                   :handler theaters/delete-theater}}]
-    ["/schedules" {:get (fn [req]
-                          (schedules/get-schedules-by-theater
-                            (assoc-in req [:parameters :body :theater]
-                                      (get-in req [:parameters :path :id]))))}]]])
+    ["/schedules" {:get {:summary "(everyone) get all schdules of an theater"
+                         :description "Everyone (without login) can see all schedules belong to a specific theater"
+                         :handler (fn [req]
+                                    (schedules/get-schedules-by-theater
+                                      (assoc-in req [:parameters :body :theater]
+                                                (get-in req [:parameters :path :id]))))}}]
+    ["/managers" {:get {:summary "(admins) get all schdules belong to a theater"
+                         :description "Only admins can see the list of managers working at a specific theater"
+                         :parameters {:header {(s/optional-key :authorization) s/Str}}
+                         :handler (fn [req]
+                                    (persons/get-managers-by-theater
+                                      (assoc-in req [:parameters :body :theater]
+                                                (get-in req [:parameters :path :id]))))}}]]])
 
 (def user-routes
   ["/users" {:middleware [mw/token-valid mw/not-expired [mw/roles "admin"]]
