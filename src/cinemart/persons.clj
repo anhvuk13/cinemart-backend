@@ -78,5 +78,4 @@
                                            :manager (:id account)})}]
     (res/created
       (str "/managers/" (:id account))
-      {:response {:manager account
-                  :management management}})))
+      {:response account})))

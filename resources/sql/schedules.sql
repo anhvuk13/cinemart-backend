@@ -29,6 +29,10 @@ DROP TABLE IF EXISTS schedules;
 -- :name get-schedules :? :*
 SELECT * FROM schedules;
 
+-- :name get-schedules-by-theater :? :*
+SELECT * FROM schedules
+WHERE theater = :theater;
+
 -- :name get-schedule-by-id :? :1
 SELECT * FROM schedules
 WHERE id = :id;

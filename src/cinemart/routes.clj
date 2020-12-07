@@ -81,8 +81,9 @@
                   :middleware [mw/token-valid mw/not-expired [mw/roles "admin"]]
                   :handler theaters/delete-theater}}]
     ["/schedules" {:get (fn [req]
-                          (res/ok {:response (:parameters req)
-                                   :header (get-in req [:headers "user-agent"])}))}]]])
+                          (schedules/get-schedules-by-theater
+                            (assoc-in req [:parameters :body :theater]
+                                      (get-in req [:parameters :path :id]))))}]]])
 
 (def user-routes
   ["/users" {:middleware [mw/token-valid mw/not-expired [mw/roles "admin"]]

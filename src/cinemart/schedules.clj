@@ -3,8 +3,10 @@
             [cinemart.db :as db]))
 
 (defn get-schedules [_]
-  {:status 200
-   :body (db/get-schedules db/config)})
+  (res/ok {:response (db/get-schedules db/config)} ))
+
+(defn get-schedules-by-theater [{:keys [parameters]}]
+  (res/ok {:response (db/get-schedules-by-theater db/config (:body parameters))}))
 
 (defn create-schedule [{:keys [parameters]}]
   (let [data (:body parameters)
