@@ -3,7 +3,7 @@
             [hugsql.core :as hugsql]
             [buddy.hashers :as h]))
 
-(defonce config c/db-config)
+(def config c/db-config)
 
 (hugsql/def-db-fns "sql/movies.sql")
 (create-movies-table config)

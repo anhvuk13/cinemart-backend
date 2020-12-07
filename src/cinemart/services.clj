@@ -5,9 +5,9 @@
             [buddy.sign.jwt :as jwt]))
 (import java.util.Date)
 
-(defonce secret c/secret)
-(defonce token-valid c/token-valid)
-(defonce ref-token-valid c/ref-token-valid)
+(def secret c/secret)
+(def token-valid c/token-valid)
+(def ref-token-valid c/ref-token-valid)
 
 (defn now []
   (* (.getTime (java.util.Date.))))
