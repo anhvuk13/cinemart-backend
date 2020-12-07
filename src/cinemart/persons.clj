@@ -72,10 +72,10 @@
                     (s/hashpass)
                     ((partial db/insert-manager db/config))
                     (dissoc :password))
-        management {:management
-                    (db/insert-management db/config
-                                          {:theater (:theater data)
-                                           :manager (:id account)})}]
+        theater_name (:name (db/get-theater-by-id db/config {:id (:theater data)}))]
+    (db/insert-management db/config
+                          {:theater (:theater data)
+                           :manager (:id account)})
     (res/created
       (str "/managers/" (:id account))
-      {:response account})))
+      {:response (assoc account :theater_name theater_name)})))
