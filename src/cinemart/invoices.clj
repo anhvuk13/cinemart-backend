@@ -1,13 +1,12 @@
 (ns cinemart.invoices
   (:require [ring.util.http-response :as res]
-            [clj.invoices :as i]
             [cinemart.db :as db]))
 
 (defn get-invoices [req]
   (res/ok {:response (db/get-invoices db/config)}))
 
 (defn get-invoice-by-id [{:keys [parameters]}]
-  (res/ok {:response (i/get-invoice-by-id (get-in parameters [:path :id]))}))
+  (res/ok {:response (db/get-invoice-by-id db/config (:path parameters))}))
 
 (defn create-invoices [{:keys [parameters]}]
   (let [user (get-in parameters [:body :user])

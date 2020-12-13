@@ -1,5 +1,6 @@
 (ns cinemart.db
   (:require [custom.config :as c]
+            [utils.coerce]
             [hugsql.core :as hugsql]
             [buddy.hashers :as h]))
 

@@ -31,7 +31,7 @@ SELECT * FROM invoices;
 -- :name get-invoice-by-id :? :1
 --SELECT * FROM invoices
 --WHERE id = :id;
-SELECT i.id, i.user_id, i.schedule, i.paid, i.cost,
+SELECT i.id, i.user_id, i.schedule, i.paid, i.cost, i.created_at,
 array_agg(t.seat) seats, array_agg(t.seat_name) seats_name
 FROM invoices i
 INNER JOIN tickets t
