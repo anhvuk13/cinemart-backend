@@ -9,6 +9,7 @@
             [cinemart.movies :as movies]
             [cinemart.schedules :as schedules]
             [cinemart.theaters :as theaters]
+            [cinemart.invoices :as invoices]
             [cinemart.tickets :as tickets]))
 
 (def StrInt (s/pred (fn [req]
@@ -53,13 +54,13 @@
             :delete movies/delete-movie}]])
 
 (def theater-routes
-  ["/theaters" {:swagger {:tags ["theaters"]}}
+  ["/theaters" {:swagger {:tags ["theaters"]}
+                :parameters {:header {(s/optional-key :authorization) s/Str}}}
    ["" {:get {:summary "show all theater"
               :handler theaters/get-theaters}
         :post {:summary "(admin) create a new theater and its manager"
                :description "Only admins take responsibility to create a theater."
-               :parameters {:header {(s/optional-key :authorization) s/Str}
-                            :body {:theater {:name s/Str
+               :parameters {:body {:theater {:name s/Str
                                              :address s/Str}
                                    :manager {:mail s/Str
                                              :password s/Str}}}
@@ -71,28 +72,39 @@
          :put {:summary "(admin|manager) update theater's info"
                :description "Managers who manage the current theater or any admins can update this theater info."
                :middleware [mw/token-valid mw/not-expired [mw/roles "admin" "manager"] mw/managing?]
-               :parameters {:header {(s/optional-key :authorization) s/Str}
-                            :body {(s/optional-key :name) s/Str
+               :parameters {:body {(s/optional-key :name) s/Str
                                    (s/optional-key :address) s/Str}}
                :handler theaters/update-theater}
          :delete {:summary "(admin) delete current theater"
                   :description "Only admins have permission to delete a theater."
-                  :parameters {:header {(s/optional-key :authorization) s/Str}}
                   :middleware [mw/token-valid mw/not-expired [mw/roles "admin"]]
                   :handler theaters/delete-theater}}]
-    ["/schedules" {:get {:summary "(everyone) get all schdules of an theater"
+    ["/schedules" {:get {:summary "get all schdules of an theater"
                          :description "Everyone (without login) can see all schedules belong to a specific theater"
                          :handler (fn [req]
                                     (schedules/get-schedules-by-theater
                                       (assoc-in req [:parameters :body :theater]
-                                                (get-in req [:parameters :path :id]))))}}]
+                                                (get-in req [:parameters :path :id]))))}
+                   :post {:summary "(manager) create a schedules"
+                          :description "Managers who managing current theater can create a schedule for it."
+                          :parameters {:body {:movie s/Int
+                                              :room s/Int
+                                              :nrow s/Int
+                                              :ncolumn s/Int
+                                              :price s/Int
+                                              :time s/Str}}
+                          :middleware [mw/token-valid mw/not-expired [mw/roles "admin" "manager"] mw/managing?]
+                          :handler (fn [req]
+                                     (schedules/create-schedule
+                                       (assoc-in req [:parameters :body :theater]
+                                                 (get-in req [:parameters :path :id]))))}}]
     ["/managers" {:get {:summary "(admins) get all schdules belong to a theater"
-                         :description "Only admins can see the list of managers working at a specific theater"
-                         :parameters {:header {(s/optional-key :authorization) s/Str}}
-                         :handler (fn [req]
-                                    (persons/get-managers-by-theater
-                                      (assoc-in req [:parameters :body :theater]
-                                                (get-in req [:parameters :path :id]))))}}]]])
+                        :description "Only admins and managers assigned can see the list of managers working at a specific theater"
+                        :middleware [mw/token-valid mw/not-expired [mw/roles "admin" "manager"] mw/managing?]
+                        :handler (fn [req]
+                                   (persons/get-managers-by-theater
+                                     (assoc-in req [:parameters :body :theater]
+                                               (get-in req [:parameters :path :id]))))}}]]])
 
 (def user-routes
   ["/users" {:middleware [mw/token-valid mw/not-expired [mw/roles "admin"]]
@@ -120,7 +132,7 @@
                                       (s/optional-key :mail) s/Str}}
                   :middleware [mw/hashpass]
                   :handler (persons/update-person "user")}
-            :delete {:summary "delete a user account"
+            :delete {:summary "(admin) delete a user account"
                      :handler (persons/delete-person "user")}}]])
 
 (def manager-routes
@@ -144,7 +156,7 @@
                                       (s/optional-key :password) s/Str}}
                   :middleware [mw/hashpass]
                   :handler (persons/update-person "manager")}
-            :delete {:summary "delete a manager account"
+            :delete {:summary "(admin) delete a manager account"
                      :handler (persons/delete-person "manager")}}]])
 
 (def admin-routes
@@ -167,8 +179,24 @@
                                       (s/optional-key :password) s/Str}}
                   :middleware [mw/hashpass]
                   :handler (persons/update-person "admin")}
-            :delete {:summary "delete a admin account"
+            :delete {:summary "(admin) delete a admin account"
                      :handler (persons/delete-person "admin")}}]])
+
+(def invoice-routes
+  ["/invoices" {:swagger {:tags ["invoices"]}
+                :middleware [mw/token-valid mw/not-expired [mw/roles "admin"]]
+                :parameters {:header {(s/optional-key :authorization) s/Str}}}
+   ["" {:get {:summary "(admin) get all invoices"
+              :handler invoices/get-invoices}
+        :post {:summary "(admin) create an invoice"
+               :parameters {:body {:schedule s/Int
+                                   :user s/Int
+                                   :booked_seats [s/Int]
+                                   :seats_name [s/Str]}}
+               :handler invoices/create-invoices}}]
+   ["/:id" {:get {:summary "(admin) get a specific invoice"
+                  :parameters {:path {:id s/Int}}
+                  :handler invoices/get-invoice-by-id}}]])
 
 (def ticket-routes
   ["/tickets" {:swagger {:tags ["tickets"]}
@@ -183,23 +211,33 @@
                         :handler tickets/delete-ticket}}])
 
 (def schedule-routes
-  ["/schedules" {:swagger {:tags ["schedules"]}}
-   ["" {:get schedules/get-schedules
-        :post {:parameters {:body {:film s/Str
-                                   :room s/Str
-                                   :time s/Str
-                                   :seats s/Int}}
-               :middleware [mw/auth]
+  ["/schedules" {:swagger {:tags ["schedules"]}
+                 :parameters {:header {(s/optional-key :authorization) s/Str}}}
+   ["" {:get {:summary "get all schedules"
+              :handler schedules/get-schedules}
+        :post {:summary "(admin) create a schedules"
+               :parameters {:body {:movie s/Int
+                                   :theater s/Int
+                                   :room s/Int
+                                   :nrow s/Int
+                                   :ncolumn s/Int
+                                   :price s/Int
+                                   :time s/Str}}
+               :middleware [mw/token-valid mw/not-expired [mw/roles "admin"]]
                :handler schedules/create-schedule}}]
-   ["/:id" {:parameters {:path {:id s/Int}}
-            :get schedules/get-schedule-by-id
-            :put {:parameters {:body {:film s/Str
-                                      :room s/Str
-                                      :time s/Str}}
-                  :middleware [mw/auth mw/admin]
-                  :handler schedules/update-schedule}
-            :delete {:middleware [mw/auth mw/admin]
-                     :handler schedules/delete-schedule}}]])
+   ["/:id" {:parameters {:path {:id s/Int}}}
+    ["" {:get {:summary "get a specific schedule"
+               :handler schedules/get-schedule-by-id}
+         :delete {:summary "(admin) delete a schdule"
+                  :middleware [mw/token-valid mw/not-expired [mw/roles "admin"]]
+                  :handler schedules/delete-schedule}}]
+    ["/reserved-seats" {:get
+                        (fn [req]
+                          (res/ok
+                            {:response
+                             (cinemart.db/get-reserved-seats-of-schedule
+                               cinemart.db/config
+                               {:schedule (get-in req [:parameters :path :id])})}))}]]])
 
 (def me-routes ["/me" {:swagger {:tags ["me"]}
                        :parameters {:header {(s/optional-key :authorization) s/Str}}

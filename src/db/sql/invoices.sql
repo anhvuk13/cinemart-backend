@@ -17,7 +17,7 @@ CREATE TABLE IF NOT EXISTS invoices (
     FOREIGN KEY (schedule)
       REFERENCES schedules (id)
         ON UPDATE CASCADE
-        ON DELETE CASCADE,
+        ON DELETE NO ACTION,
   created_at TIMESTAMP NOT NULL DEFAULT current_timestamp
 );
 
@@ -29,13 +29,20 @@ DROP TABLE IF EXISTS invoices;
 SELECT * FROM invoices;
 
 -- :name get-invoice-by-id :? :1
-SELECT * FROM invoices
-WHERE id = :id;
+--SELECT * FROM invoices
+--WHERE id = :id;
+SELECT i.id, i.user_id, i.schedule, i.paid, i.cost,
+array_agg(t.seat) seats, array_agg(t.seat_name) seats_name
+FROM invoices i
+INNER JOIN tickets t
+ON t.invoice = i.id
+WHERE i.id = :id
+GROUP BY i.id, i.user_id, i.schedule, i.paid, i.cost;
 
 -- :name insert-invoice :? :1
-INSERT INTO invoices (user_id, schedule, paid)
-VALUES (:user-id, :schedule, :paid)
-RETURNING id;
+INSERT INTO invoices (user_id, schedule)
+VALUES (:user_id, :schedule)
+RETURNING *;
 
 -- :name update-invoice-status :! :1
 UPDATE invoices

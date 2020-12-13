@@ -1,9 +1,9 @@
 (ns cinemart.db
-  (:require [cinemart.config :as c]
+  (:require [custom.config :as c]
             [hugsql.core :as hugsql]
             [buddy.hashers :as h]))
 
-(def config c/db-config)
+(def config c/hugsql-config)
 
 (hugsql/def-db-fns "sql/movies.sql")
 (create-movies-table config)

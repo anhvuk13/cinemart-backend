@@ -3,7 +3,7 @@
             [cinemart.db :as db]))
 
 (defn get-schedules [_]
-  (res/ok {:response (db/get-schedules db/config)} ))
+  (res/ok {:response (db/get-schedules db/config)}))
 
 (defn get-schedules-by-theater [{:keys [parameters]}]
   (res/ok {:response (db/get-schedules-by-theater db/config (:body parameters))}))
@@ -21,16 +21,16 @@
       (res/ok {:response schedule})
       (res/not-found {:error "schedule not found"}))))
 
-(defn update-schedule [{:keys [parameters]}]
-  (let [id (:path parameters)
-        body (:body parameters)
-        data (merge body id)
-        updated-count (db/update-schedule-by-id db/config data)]
-    (if (= 1 updated-count)
-      (res/ok {:updated true
-               :response (db/get-schedule-by-id db/config id)})
-      (res/not-found {:updated false
-                      :error "unable to update schedule"}))))
+;;(defn update-schedule [{:keys [parameters]}]
+;;  (let [id (:path parameters)
+;;        body (:body parameters)
+;;        data (merge body id)
+;;        updated-count (db/update-schedule-by-id db/config data)]
+;;    (if (= 1 updated-count)
+;;      (res/ok {:updated true
+;;               :response (db/get-schedule-by-id db/config id)})
+;;      (res/not-found {:updated false
+;;                      :error "unable to update schedule"}))))
 
 (defn delete-schedule [{:keys [parameters]}]
   (let [id (:path parameters)

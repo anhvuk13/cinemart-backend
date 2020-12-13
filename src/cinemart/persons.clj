@@ -59,12 +59,14 @@
           before-deleted (get-db db/config id)
           deleted-count (delete-db db/config id)]
       (if (= 1 deleted-count)
-        (res/ok
-         {:deleted true
-          :response {:before-deleted before-deleted}})
+        (do
+          (s/revoke-all-tokens id role [])
+          (res/ok
+            {:deleted true
+             :response {:before-deleted before-deleted}}))
         (res/not-found
-         {:deleted false
-          :error (str "unable to delete " role)})))))
+          {:deleted false
+           :error (str "unable to delete " role)})))))
 
 (defn create-manager [{:keys [parameters]}]
   (let [data (:body parameters)

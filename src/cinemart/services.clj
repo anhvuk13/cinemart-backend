@@ -1,5 +1,5 @@
 (ns cinemart.services
-  (:require [cinemart.config :as c]
+  (:require [custom.config :as c]
             [cinemart.db :as db]
             [buddy.hashers :as h]
             [buddy.sign.jwt :as jwt]))

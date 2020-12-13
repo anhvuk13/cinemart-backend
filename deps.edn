@@ -1,4 +1,4 @@
-{:paths ["src" "resources"]
+{:paths ["src" "src/db"]
  :deps {org.clojure/clojure {:mvn/version "1.10.1"}
         metosin/reitit {:mvn/version "0.5.10"}
         metosin/ring-http-response {:mvn/version "0.9.1"}
@@ -7,11 +7,11 @@
         ring-cors/ring-cors {:mvn/version "0.1.13"}
         http-kit/http-kit {:mvn/version "2.5.0"}
         org.postgresql/postgresql {:mvn/version "42.2.18"}
+        clj-postgresql/clj-postgresql {:mvn/version "0.7.0"}
         nrepl/nrepl {:mvn/version "0.7.0"}
         cider/cider-nrepl {:mvn/version "0.25.2"}
         com.layerware/hugsql {:mvn/version "0.5.1"}
         buddy/buddy-hashers {:mvn/version "1.6.0"}
-        buddy/buddy-auth {:mvn/version "2.2.0"}
         buddy/buddy-sign {:mvn/version "3.2.0"}}
  :aliases {:run {:main-opts ["-m" "cinemart.core"]}
            :repl {:main-opts ["-m" "nrepl.cmdline"

@@ -3,7 +3,7 @@
 -- :result :raw
 -- :doc creates movies table
 CREATE TABLE IF NOT EXISTS movies (
-  id TEXT PRIMARY KEY,
+  id SERIAL PRIMARY KEY,
   name TEXT NOT NULL,
   poster TEXT,
   backdrop TEXT,

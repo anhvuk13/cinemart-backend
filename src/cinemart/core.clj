@@ -41,6 +41,7 @@
      r/manager-routes
      r/admin-routes
      r/schedule-routes
+     r/invoice-routes
      r/ticket-routes
      r/ping-routes]
     {:data {:coercion reitit.coercion.schema/coercion

@@ -5,6 +5,7 @@
 CREATE TABLE IF NOT EXISTS tickets (
   invoice SERIAL NOT NULL,
   seat INTEGER NOT NULL,
+  seat_name TEXT NOT NULL,
   price INTEGER NOT NULL,
   PRIMARY KEY (invoice, seat),
   CONSTRAINT fk_invoice
@@ -21,6 +22,14 @@ CREATE OR REPLACE FUNCTION insert_tickets_trigger()
 $$
 BEGIN
   update invoices set cost = cost + new.price where invoices.id = new.invoice;
+  update schedules set reserved = reserved + 1
+  where id in (
+    select schedules.id from schedules
+    inner join invoices on schedules.id = invoices.schedule
+    inner join tickets on invoices.id = tickets.invoice
+    where tickets.invoice = new.invoice
+    and tickets.seat = new.seat
+  );
   RETURN NEW;
 END;
 $$;
@@ -31,7 +40,15 @@ CREATE OR REPLACE FUNCTION delete_tickets_trigger()
 $$
 BEGIN
   update invoices set cost = cost - old.price where invoices.id = old.invoice;
-  RETURN NEW;
+  update schedules set reserved = reserved - 1
+  where id in (
+    select schedules.id from schedules
+    inner join invoices on schedules.id = invoices.schedule
+    inner join tickets on invoices.id = tickets.invoice
+    where tickets.invoice = old.invoice
+    and tickets.seat = old.seat
+  );
+  RETURN OLD;
 END;
 $$;
 DROP TRIGGER IF EXISTS tg_insert_tickets ON tickets;
@@ -54,18 +71,24 @@ DROP TABLE IF EXISTS tickets;
 -- :name get-tickets :? :*
 SELECT * FROM tickets;
 
--- :name get-seats-of-invoice :? :1
-SELECT seat FROM tickets
+-- :name get-seats-of-invoice :? :*
+SELECT seat, seat_name FROM tickets
 WHERE invoice = :invoices;
 
--- :name get-ticket-by-invoice-and-seat
+-- :name get-ticket-by-invoice-and-seat :? :1
 SELECT * FROM tickets
 WHERE invoice = :invoices AND seat = :seat;
 
+-- :name get-reserved-seats-of-schedule :? :*
+SELECT seat, seat_name FROM tickets
+INNER JOIN invoices ON invoices.id = tickets.invoice
+INNER JOIN schedules ON schedules.id = invoices.schedule
+WHERE schedules.id = :schedule;
+
 -- :name insert-ticket :? :1
-INSERT INTO tickets (invoice, seat, price)
-VALUES (:invoice, :seat, :price)
-RETURNING invoice, seat;
+INSERT INTO tickets (invoice, seat, seat_name, price)
+VALUES (:invoice, :seat, :seat_name, :price)
+RETURNING *;
 
 -- :name delete-ticket-by-invoice-and-seat :! :1
 DELETE FROM tickets
