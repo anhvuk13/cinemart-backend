@@ -40,6 +40,7 @@
      r/user-routes
      r/manager-routes
      r/admin-routes
+     r/movie-routes
      r/schedule-routes
      r/invoice-routes
      r/ticket-routes

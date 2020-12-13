@@ -47,10 +47,20 @@
 (def movie-routes
   ["/movies" {:swagger {:tags ["movies"]}}
    ["" {:get movies/get-movies
-        :post movies/create-movie}]
-   ["/:id" {:parameters {:path {:id s/Str}}
+        :post {:parameters {:body {:name s/Str
+                                   (s/optional-key :poster) s/Str
+                                   (s/optional-key :backdrop) s/Str
+                                   (s/optional-key :description) s/Str
+                                   (s/optional-key :length) s/Int}}
+               :handler movies/create-movie}}]
+   ["/:id" {:parameters {:path {:id s/Int}}
             :get movies/get-movie-by-id
-            :put movies/update-movie
+            :put {:parameters {:body {(s/optional-key :name) s/Str
+                                      (s/optional-key :poster) s/Str
+                                      (s/optional-key :backdrop) s/Str
+                                      (s/optional-key :description) s/Str
+                                      (s/optional-key :length) s/Int}}
+                  :handler movies/update-movie}
             :delete movies/delete-movie}]])
 
 (def theater-routes
@@ -85,8 +95,8 @@
                                     (schedules/get-schedules-by-theater
                                       (assoc-in req [:parameters :body :theater]
                                                 (get-in req [:parameters :path :id]))))}
-                   :post {:summary "(manager) create a schedules"
-                          :description "Managers who managing current theater can create a schedule for it."
+                   :post {:summary "(admin|manager) create a schedules"
+                          :description "Admins or managers who managing current theater can create a schedule for it."
                           :parameters {:body {:movie s/Int
                                               :room s/Int
                                               :nrow s/Int
@@ -184,9 +194,10 @@
 
 (def invoice-routes
   ["/invoices" {:swagger {:tags ["invoices"]}
-                :middleware [mw/token-valid mw/not-expired [mw/roles "admin"]]
+                :middleware [mw/token-valid mw/not-expired]
                 :parameters {:header {(s/optional-key :authorization) s/Str}}}
-   ["" {:get {:summary "(admin) get all invoices"
+   ["" {:middleware [[mw/roles "admin"]]
+        :get {:summary "(admin) get all invoices"
               :handler invoices/get-invoices}
         :post {:summary "(admin) create an invoice"
                :parameters {:body {:schedule s/Int
@@ -195,8 +206,13 @@
                                    :seats_name [s/Str]}}
                :handler invoices/create-invoices}}]
    ["/:id" {:get {:summary "(admin) get a specific invoice"
+                  :middleware [[mw/roles "admin"]]
                   :parameters {:path {:id s/Int}}
-                  :handler invoices/get-invoice-by-id}}]])
+                  :handler invoices/get-invoice-by-id}
+            :delete {:summary "(user|admin) delete an invoice"
+                     :middleware [[mw/roles "admin" "user"] mw/user-own-invoice?]
+                     :parameters {:path {:id s/Int}}
+                     :handler invoices/delete-invoces}}]])
 
 (def ticket-routes
   ["/tickets" {:swagger {:tags ["tickets"]}
@@ -241,20 +257,34 @@
 
 (def me-routes ["/me" {:swagger {:tags ["me"]}
                        :parameters {:header {(s/optional-key :authorization) s/Str}}
-                       :middleware [mw/token-valid mw/not-expired]
-                       :get {:summary "get your profile"
-                             :handler me/get-my-info}
-                       :delete {:summary "delete your profile"
-                                :handler me/delete-my-account}
-                       :put {:summary "update your account info"
-                             :description "Provide which key:value pairs need to be changed. The current pair of tokens will also be renewed."
-                             :parameters {:body {(s/optional-key :fullname) s/Str
-                                                 (s/optional-key :username) s/Str
-                                                 (s/optional-key :mail) s/Str
-                                                 (s/optional-key :password) s/Str
-                                                 (s/optional-key :dob) s/Str}}
-                             :middleware [mw/hashpass]
-                             :handler me/update-my-info}}])
+                       :middleware [mw/token-valid mw/not-expired]}
+                ["" {:get {:summary "(login) get your profile"
+                           :handler me/get-my-info}
+                     :delete {:summary "(login) delete your profile"
+                              :handler me/delete-my-account}
+                     :put {:summary "(login) update your account info"
+                           :description "Provide which key:value pairs need to be changed. The current pair of tokens will also be renewed."
+                           :parameters {:body {(s/optional-key :fullname) s/Str
+                                               (s/optional-key :username) s/Str
+                                               (s/optional-key :mail) s/Str
+                                               (s/optional-key :password) s/Str
+                                               (s/optional-key :dob) s/Str}}
+                           :middleware [mw/hashpass]
+                           :handler me/update-my-info}}]
+                ["/invoices" {:middleware [[mw/roles "user"]]
+                              :get {:summary "(user) get my invoices"
+                                    :handler invoices/get-my-invoices}
+                              :post {:summary "(user) book tickets"
+                                     :parameters {:body {:user s/Int
+                                                         :schedule s/Int
+                                                         :booked_seats [s/Int]
+                                                         :seats_name [s/Str]}}
+                                     :handler (fn [req]
+                                                (invoices/create-invoices
+                                                  (assoc-in
+                                                    req
+                                                    [:parameters :body :user]
+                                                    (get-in req [:info :id]))))}}]])
 
 (def refresh-token ["/refresh-token" {:summary "acquire new pair of tokens"
                                       :swagger {:tags ["auth"]}

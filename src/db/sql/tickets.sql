@@ -21,15 +21,10 @@ CREATE OR REPLACE FUNCTION insert_tickets_trigger()
   AS
 $$
 BEGIN
-  update invoices set cost = cost + new.price where invoices.id = new.invoice;
-  update schedules set reserved = reserved + 1
-  where id in (
-    select schedules.id from schedules
-    inner join invoices on schedules.id = invoices.schedule
-    inner join tickets on invoices.id = tickets.invoice
-    where tickets.invoice = new.invoice
-    and tickets.seat = new.seat
-  );
+  update invoices
+  set cost = cost + new.price,
+      tickets_count = tickets_count + 1
+  where invoices.id = new.invoice;
   RETURN NEW;
 END;
 $$;
@@ -39,15 +34,10 @@ CREATE OR REPLACE FUNCTION delete_tickets_trigger()
   AS
 $$
 BEGIN
-  update invoices set cost = cost - old.price where invoices.id = old.invoice;
-  update schedules set reserved = reserved - 1
-  where id in (
-    select schedules.id from schedules
-    inner join invoices on schedules.id = invoices.schedule
-    inner join tickets on invoices.id = tickets.invoice
-    where tickets.invoice = old.invoice
-    and tickets.seat = old.seat
-  );
+  update invoices
+  set cost = cost - old.price,
+      tickets_count = tickets_count - 1
+  where invoices.id = old.invoice;
   RETURN OLD;
 END;
 $$;
@@ -79,8 +69,9 @@ WHERE invoice = :invoices;
 SELECT * FROM tickets
 WHERE invoice = :invoices AND seat = :seat;
 
--- :name get-reserved-seats-of-schedule :? :*
-SELECT seat, seat_name FROM tickets
+-- :name get-reserved-seats-of-schedule :? :1
+SELECT array_agg(seat) reserved_seats, array_agg(seat_name) reserved_seats_name
+FROM tickets
 INNER JOIN invoices ON invoices.id = tickets.invoice
 INNER JOIN schedules ON schedules.id = invoices.schedule
 WHERE schedules.id = :schedule;

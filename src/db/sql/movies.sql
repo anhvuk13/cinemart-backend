@@ -26,7 +26,7 @@ WHERE id = :id;
 -- :name insert-movie :? :1
 INSERT INTO movies (name, poster, backdrop, description, length)
 VALUES (:name, :poster, :backdrop, :description, :length)
-RETURNING id;
+RETURNING *;
 
 -- :name update-movie-by-id :! :1
 UPDATE movies

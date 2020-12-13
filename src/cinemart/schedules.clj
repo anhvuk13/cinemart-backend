@@ -10,9 +10,14 @@
 
 (defn create-schedule [{:keys [parameters]}]
   (let [data (:body parameters)
-        schedule (db/insert-schedule db/config data)]
-    (res/created (str "/schedules/" (:id schedule))
-                 {:response schedule})))
+        movie (:movie data)
+        theater (:theater data)]
+    (if (or (empty? (db/get-theater-by-id db/config {:id theater}))
+            (empty? (db/get-movie-by-id db/config {:id movie})))
+      (res/not-found {:error "movie or theater invalid"})
+      (let [schedule (db/insert-schedule db/config data)]
+        (res/created (str "/schedules/" (:id schedule))
+                     {:response schedule})))))
 
 (defn get-schedule-by-id [{:keys [parameters]}]
   (let [id (:path parameters)
@@ -36,6 +41,7 @@
   (let [id (:path parameters)
         before-deleted (db/get-schedule-by-id db/config id)
         deleted-count (db/delete-schedule-by-id db/config id)]
+    (println before-deleted)
     (if (= 1 deleted-count)
       (res/ok {:deleted true
                :response before-deleted})

@@ -48,4 +48,6 @@
 (create-auth-table config)
 
 (comment
-  (get-managers-by-theater config {:theater 1}))
+  (get-managers-by-theater config {:theater 1})
+  (get-schedule-by-id config {:id 4})
+  (get-reserved-seats-of-schedule config {:schedule 3}))

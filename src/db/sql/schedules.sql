@@ -30,15 +30,22 @@ CREATE TABLE IF NOT EXISTS schedules (
 DROP TABLE IF EXISTS schedules;
 
 -- :name get-schedules :? :*
-SELECT * from schedules;
+SELECT * FROM schedules;
 
 -- :name get-schedules-by-theater :? :*
 SELECT * FROM schedules
 WHERE theater = :theater;
 
 -- :name get-schedule-by-id :? :1
-SELECT * FROM schedules
-WHERE id = :id;
+--SELECT * FROM schedules
+--WHERE id = :id;
+SELECT s.id, s.movie, s.theater, s.nrow, s.ncolumn, s.price, s.time, s.reserved, s.created_at,
+array_agg(t.seat) reserved_seats, array_agg(t.seat_name) reserved_seats_name
+FROM schedules s
+FULL OUTER JOIN invoices i ON i.schedule = s.id
+FULL OUTER JOIN tickets t ON t.invoice = i.id
+WHERE s.id = :id
+GROUP BY s.id, s.movie, s.theater, s.nrow, s.ncolumn, s.price, s.time, s.reserved, s.created_at;
 
 -- :name insert-schedule :? :1
 INSERT INTO schedules (movie, theater, room, nrow, ncolumn, price, time)

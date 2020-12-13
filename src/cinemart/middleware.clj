@@ -88,6 +88,16 @@
       (res/unauthorized {:error "you're not in charge of managing this theater"})
       (next req))))
 
+(defn user-own-invoice? [next]
+  (fn [req]
+    (let [info (:info req)
+          id (get-in req [:parameters :path])
+          invoice (db/get-invoice-by-id db/config id)]
+      (if (and (= "user" (:role info))
+               (not= (:id info) (:user_id invoice)))
+        (res/unauthorized {:error "you not own this invoice"})
+        (next (assoc req :before-deleted invoice))))))
+
 (defn StrInt? [next key]
   (fn [req]
     (let [val (get-in req [:parameters :body key])]

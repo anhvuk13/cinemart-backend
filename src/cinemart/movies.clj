@@ -3,35 +3,36 @@
             [cinemart.db :as db]))
 
 (defn get-movies [_]
-  (res/ok {:movies (db/get-movies db/config)}))
+  (res/ok {:response (db/get-movies db/config)}))
 
 (defn get-movie-by-id
   [{:keys [parameters]}]
   (let [id (:path parameters)
         movie (db/get-movie-by-id db/config id)]
     (if movie
-      (res/ok {:movie movie})
-      (res/not-found {:error "Movie not found"}))))
+      (res/ok {:response movie})
+      (res/not-found {:error "movie not found"}))))
 
 (defn create-movie [{:keys [parameters]}]
   (let [movie (-> (:body parameters)
-                  (db/insert-movie db/config)
-                  (db/get-movie-by-id db/config))]
+                  ((partial db/insert-movie db/config)))]
     (res/created
-     (str "/movie/" (:id movie))
-     {:movie movie})))
+     (str "/movies/" (:id movie))
+     {:response movie})))
 
 (defn update-movie
   [{:keys [parameters]}]
-  (let [id (get-in parameters [:path :id])
-        movie (assoc (:body parameters) :id id)
+  (let [id (:path parameters)
+        before-updated (db/get-movie-by-id db/config id)
+        movie (merge before-updated (:body parameters))
         updated-count (db/update-movie-by-id db/config movie)]
     (if (= 1 updated-count)
       (res/ok {:updated true
-               :movie (db/get-movie-by-id db/config {:id id})})
+               :response {:before-updated before-updated
+                          :after-updated movie}})
       (res/not-found
        {:updated false
-        :error "Unable to update movie"}))))
+        :error "unable to update movie"}))))
 
 (defn delete-movie
   [{:keys [parameters]}]
@@ -41,7 +42,9 @@
     (if (= 1 deleted-count)
       (res/ok
        {:deleted true
-        :movie before-deleted})
+        :response {:before-deleted before-deleted}})
       (res/not-found
        {:deleted false
-        :error "Unable to delete movie"}))))
+        :error "unable to delete movie"}))))
+
+(get-movie-by-id {:parameters {:path {:id 2}}})
