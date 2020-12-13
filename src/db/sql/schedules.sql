@@ -4,16 +4,19 @@
 -- :doc creates schedules table
 CREATE TABLE IF NOT EXISTS schedules (
   id SERIAL PRIMARY KEY,
-  movie TEXT NOT NULL,
+  movie SERIAL NOT NULL,
   theater SERIAL NOT NULL,
   room INTEGER NOT NULL,
-  seats INTEGER NOT NULL,
+  nrow INTEGER NOT NULL,
+  ncolumn INTEGER NOT NULL,
+  price INTEGER NOT NULL,
   time TEXT NOT NULL,
+  reserved INTEGER DEFAULT 0,
   CONSTRAINT fk_movie
     FOREIGN KEY (movie)
       REFERENCES movies (id)
         ON UPDATE CASCADE
-        ON DELETE CASCADE,
+        ON DELETE NO ACTION,
   CONSTRAINT fk_theater
     FOREIGN KEY (theater)
       REFERENCES theaters (id)
@@ -27,7 +30,7 @@ CREATE TABLE IF NOT EXISTS schedules (
 DROP TABLE IF EXISTS schedules;
 
 -- :name get-schedules :? :*
-SELECT * FROM schedules;
+SELECT * from schedules;
 
 -- :name get-schedules-by-theater :? :*
 SELECT * FROM schedules
@@ -38,14 +41,9 @@ SELECT * FROM schedules
 WHERE id = :id;
 
 -- :name insert-schedule :? :1
-INSERT INTO schedules (movie, theater, room, seats, time)
-VALUES (:movie, :theater, :room, :seats, :time)
+INSERT INTO schedules (movie, theater, room, nrow, ncolumn, price, time)
+VALUES (:movie, :theater, :room, :nrow, :ncolumn, :price, :time)
 RETURNING *;
-
--- :name update-schedule-by-id :! :1
-UPDATE schedules
-SET movie = :movie, theater = :theater, room = :room, seats = :seats, time = :time
-WHERE id = :id;
 
 -- :name delete-schedule-by-id :! :1
 DELETE FROM schedules WHERE id = :id;
