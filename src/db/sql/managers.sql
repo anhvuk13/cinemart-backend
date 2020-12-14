@@ -25,18 +25,32 @@ inner join theaters as t on mt.theater = t.id;
 
 -- :name get-managers-by-theater :? :*
 SELECT mr.id, mr.mail, mr.created_at
-FROM managers as mr
-inner join management as mt on mr.id = mt.manager
-inner join theaters as t on mt.theater = t.id
+FROM managers mr
+inner join management mt on mr.id = mt.manager
+inner join theaters t on mt.theater = t.id
 WHERE t.id = :theater;
 
 -- :name get-manager-by-id :? :1
-SELECT * FROM managers
-WHERE id = :id;
+SELECT mr.id, mr.mail, mr.password, mr.created_at,
+array_agg(t.id) theater_id,
+array_agg(t.name) theater_name,
+array_agg(t.address) theater_address
+FROM managers mr
+FULL OUTER JOIN management mt ON mr.id = mt.manager
+FULL OUTER JOIN theaters t ON mt.theater = t.id
+WHERE mr.id = :id
+GROUP BY mr.id, mr.mail, mr.created_at;
 
 -- :name get-manager-by-mail :? :1
-SELECT * FROM managers
-WHERE mail = :mail;
+SELECT mr.id, mr.mail, mr.password, mr.created_at,
+array_agg(t.id) theater_id,
+array_agg(t.name) theater_name,
+array_agg(t.address) theater_address
+FROM managers mr
+FULL OUTER JOIN management mt ON mr.id = mt.manager
+FULL OUTER JOIN theaters t ON mt.theater = t.id
+WHERE mr.mail = :mail
+GROUP BY mr.id, mr.mail, mr.created_at;
 
 -- :name insert-manager :? :1
 INSERT INTO managers (password, mail)
