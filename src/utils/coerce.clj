@@ -2,6 +2,7 @@
   (:require [cheshire.core :refer [generate-string parse-string]]
             [clojure.java.jdbc :as jdbc]
             [clj-time.coerce :as tc]
+            [clj-time.format :as tf]
             [clj-time.core :as t]
             [clojure.string :as str])
   (:import clojure.lang.IPersistentMap
@@ -16,10 +17,10 @@
            org.postgresql.util.PGobject))
 
 (defn- to-date [sql-time]
-  (tc/from-sql-time sql-time))
+  (str (tc/from-sql-time sql-time)))
 
 (defn- to-sql-date [clj-time]
-  (tc/to-sql-time clj-time))
+  (tc/to-sql-time (tf/parse clj-time)))
 
 (extend-protocol jdbc/IResultSetReadColumn
   java.sql.Date
