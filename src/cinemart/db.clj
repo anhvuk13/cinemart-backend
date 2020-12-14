@@ -1,6 +1,7 @@
 (ns cinemart.db
   (:require [custom.config :as c]
             [utils.coerce]
+            [clj-time.core :refer [date-time]]
             [hugsql.core :as hugsql]
             [buddy.hashers :as h]))
 
@@ -23,7 +24,8 @@
                        :username "johndoe"
                        :mail "john@doe.com"
                        :password (h/derive "john")
-                       :dob "1/1/1970"}))
+                       :dob (date-time 1970 1 1)
+}))
 
 (hugsql/def-db-fns "sql/invoices.sql")
 (create-invoices-table config)

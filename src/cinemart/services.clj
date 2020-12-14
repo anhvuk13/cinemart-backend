@@ -2,8 +2,12 @@
   (:require [custom.config :as c]
             [cinemart.db :as db]
             [buddy.hashers :as h]
-            [buddy.sign.jwt :as jwt]))
-(import java.util.Date)
+            [buddy.sign.jwt :as jwt])
+  (:import java.util.Date))
+
+(defn parse-int [number-string]
+  (try (Integer/parseInt number-string)
+    (catch Exception e nil)))
 
 (def secret c/secret)
 (def token-valid c/token-valid)

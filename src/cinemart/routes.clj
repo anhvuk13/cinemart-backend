@@ -103,7 +103,7 @@
                                               :ncolumn s/Int
                                               :price s/Int
                                               :time s/Str}}
-                          :middleware [mw/token-valid mw/not-expired [mw/roles "admin" "manager"] mw/managing?]
+                          :middleware [mw/token-valid mw/not-expired [mw/roles "admin" "manager"] mw/managing? [mw/StrTime? :time]]
                           :handler (fn [req]
                                      (schedules/create-schedule
                                        (assoc-in req [:parameters :body :theater]
@@ -239,7 +239,7 @@
                                    :ncolumn s/Int
                                    :price s/Int
                                    :time s/Str}}
-               :middleware [mw/token-valid mw/not-expired [mw/roles "admin"]]
+               :middleware [mw/token-valid mw/not-expired [mw/roles "admin"] [mw/StrTime? :time]]
                :handler schedules/create-schedule}}]
    ["/:id" {:parameters {:path {:id s/Int}}}
     ["" {:get {:summary "get a specific schedule"

@@ -1,6 +1,8 @@
 (ns cinemart.middleware
   (:require [clojure.string :refer [split]]
             [ring.util.http-response :as res]
+            [clj-time.core :as c]
+            [clj-time.format :as f]
             [cinemart.db :as db]
             [cinemart.services :as s]
             [cinemart.auth :as auth]))
@@ -98,13 +100,31 @@
         (res/unauthorized {:error "you not own this invoice"})
         (next (assoc req :before-deleted invoice))))))
 
-(defn StrInt? [next key]
+(defn StrInt? [next & args]
   (fn [req]
-    (let [val (get-in req [:parameters :body key])]
-      (try (next (assoc-in req [:parameters :body key] (Integer/parseInt val)))
-           (catch Exception e
-             (res/bad-request
-               {:error (str key " must be StrInt (ex: '1', '2',...)")}))))))
+    ((fn [req [key & rest]]
+       (let [val-str (get-in req [:parameters :body key])
+             val (s/parse-int val-str)
+             next-req (assoc-in req [:parameters :body key] val)]
+         (if (nil? val)
+           (res/bad-request
+             {:error (str key " must be StrInt (ex: '1', '2',...)")})
+           (if (empty? rest)
+             (next next-req)
+             (recur next-req rest))))) req args)))
+
+(defn StrTime? [next & args]
+  (fn [req]
+    ((fn [req [key & rest]]
+       (let [val-str (get-in req [:parameters :body key])
+             val (f/parse val-str)
+             next-req (assoc-in req [:parameters :body key] val)]
+         (if (nil? val)
+           (res/bad-request
+             {:error (str key " must be iso time string (ex: '" (str (c/now)) "')")})
+           (if (empty? rest)
+             (next next-req)
+             (recur next-req rest))))) req args)))
 
 (comment
   ((roles #(println %) "admin" "user" "manager") {:role "manager"})

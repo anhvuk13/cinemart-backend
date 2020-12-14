@@ -5,7 +5,7 @@
 CREATE TABLE IF NOT EXISTS users (
   id SERIAL PRIMARY KEY,
   fullname TEXT NOT NULL,
-  dob TEXT NOT NULL,
+  dob TIMESTAMP NOT NULL,
   username TEXT NOT NULL,
   password TEXT NOT NULL,
   mail TEXT UNIQUE NOT NULL,

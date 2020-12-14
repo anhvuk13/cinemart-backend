@@ -10,7 +10,7 @@ CREATE TABLE IF NOT EXISTS schedules (
   nrow INTEGER NOT NULL,
   ncolumn INTEGER NOT NULL,
   price INTEGER NOT NULL,
-  time TEXT NOT NULL,
+  time TIMESTAMP NOT NULL,
   reserved INTEGER DEFAULT 0,
   CONSTRAINT fk_movie
     FOREIGN KEY (movie)
