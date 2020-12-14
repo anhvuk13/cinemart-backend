@@ -24,8 +24,7 @@
                        :username "johndoe"
                        :mail "john@doe.com"
                        :password (h/derive "john")
-                       :dob (date-time 1970 1 1)
-}))
+                       :dob (date-time 1970 1 1)}))
 
 (hugsql/def-db-fns "sql/invoices.sql")
 (create-invoices-table config)

@@ -20,7 +20,7 @@
   (str (tc/from-sql-time sql-time)))
 
 (defn- to-sql-date [clj-time]
-  (tc/to-sql-time (tf/parse clj-time)))
+  (tc/to-sql-time clj-time))
 
 (extend-protocol jdbc/IResultSetReadColumn
   java.sql.Date
