@@ -30,11 +30,28 @@ CREATE TABLE IF NOT EXISTS schedules (
 DROP TABLE IF EXISTS schedules;
 
 -- :name get-schedules :? :*
-SELECT * FROM schedules;
+SELECT * FROM schedules
+ORDER BY time DESC;
+
+-- :name get-schedules-by-week :? :*
+SELECT * FROM schedules
+WHERE extract(year from time) = :year
+AND extract(month from time) = :month
+AND extract(week from time) = :week
+ORDER BY time DESC;
+
+-- :name get-schedules-by-date :? :*
+SELECT * FROM schedules
+WHERE extract(year from time) = :year
+AND extract(month from time) = :month
+AND extract(week from time) = :week
+AND extract(day from time) = :day
+ORDER BY time DESC;
 
 -- :name get-schedules-by-theater :? :*
 SELECT * FROM schedules
-WHERE theater = :theater;
+WHERE theater = :theater
+ORDER BY time DESC;
 
 -- :name get-schedule-by-id :? :1
 --SELECT * FROM schedules

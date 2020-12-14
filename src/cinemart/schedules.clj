@@ -1,12 +1,54 @@
 (ns cinemart.schedules
   (:require [ring.util.http-response :as res]
+            [clj-time.core :as t]
             [cinemart.db :as db]))
 
 (defn get-schedules [_]
   (res/ok {:response (db/get-schedules db/config)}))
 
+(defn get-schedules-by-date [_]
+  (let [now (t/now)
+        year (t/year now)
+        month (t/month now)
+        week (t/week-number-of-year now)
+        day (t/day now)]
+    (res/ok {:response (db/get-schedules-by-date
+                         db/config
+                         {:year year
+                          :month month
+                          :week week
+                          :day day})})))
+
+(defn get-schedules-by-week [_]
+  (let [now (t/now)
+        year (t/year now)
+        month (t/month now)
+        week (t/week-number-of-year now)]
+    (res/ok {:response (db/get-schedules-by-week
+                         db/config
+                         {:year year
+                          :month month
+                          :week week})})))
+
 (defn get-schedules-by-theater [{:keys [parameters]}]
-  (res/ok {:response (db/get-schedules-by-theater db/config (:body parameters))}))
+  (let [theater (get-in parameters [:body :theater])
+        now (t/now)
+        year (t/year now)
+        month (t/month now)
+        week (t/week-number-of-year now)
+        day (t/day now)
+        all (db/get-schedules-by-theater db/config {:theater theater})
+        by-week (filter (fn [{:keys [time]}]
+                          (and (= year (t/year time))
+                               (= month (t/month time))
+                               (= week (t/week-number-of-year (t/now)))))
+                        all)
+        by-day (filter (fn [{:keys [time]}]
+                         (= day (t/day time)))
+                       by-week)]
+    (res/ok {:response {:all all
+                        :week by-week
+                        :day by-day}})))
 
 (defn create-schedule [{:keys [parameters]}]
   (let [data (:body parameters)

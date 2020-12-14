@@ -241,6 +241,11 @@
                                    :time s/Str}}
                :middleware [mw/token-valid mw/not-expired [mw/roles "admin"] [mw/StrTime? :time]]
                :handler schedules/create-schedule}}]
+   ["/current"
+    ["/day" {:get {:summary "get schedules of this day"
+                   :handler schedules/get-schedules-by-date}}]
+    ["/week" {:get {:summary "get schedules of this week"
+                    :handler schedules/get-schedules-by-week}}]]
    ["/:id" {:parameters {:path {:id s/Int}}}
     ["" {:get {:summary "get a specific schedule"
                :handler schedules/get-schedule-by-id}
