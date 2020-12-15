@@ -2,6 +2,7 @@
   (:require [schema.core :as s]
             [reitit.swagger :as swagger]
             [ring.util.http-response :as res]
+            [cinemart.db :as db]
             [cinemart.middleware :as mw]
             [cinemart.auth :as auth]
             [cinemart.me :as me]
@@ -47,19 +48,36 @@
 (def movie-routes
   ["/movies" {:swagger {:tags ["movies"]}}
    ["" {:get movies/get-movies
-        :post {:parameters {:body {:name s/Str
-                                   (s/optional-key :poster) s/Str
-                                   (s/optional-key :backdrop) s/Str
-                                   (s/optional-key :description) s/Str
-                                   (s/optional-key :length) s/Int}}
-               :handler movies/create-movie}}]
+        :post {:middleware [[mw/ToPgJson :genres]]
+               :parameters {:body {:runtime s/Int
+                                   :genres [{:id s/Int
+                                             :name s/Str}]
+                                   :overview s/Str
+                                   :title s/Str
+                                   :poster_path s/Str
+                                   :backdrop_path s/Str}}
+               :handler movies/create-movie}
+        :patch {:middleware [[mw/ToPgJson :genres]]
+                :parameters {:body {:id s/Int
+                                    :runtime s/Int
+                                    :genres [{:id s/Int
+                                              :name s/Str}]
+                                    :overview s/Str
+                                    :title s/Str
+                                    :poster_path s/Str
+                                    :backdrop_path s/Str}}
+                :handler movies/draw-movie}}]
    ["/:id" {:parameters {:path {:id s/Int}}
             :get movies/get-movie-by-id
-            :put {:parameters {:body {(s/optional-key :name) s/Str
-                                      (s/optional-key :poster) s/Str
-                                      (s/optional-key :backdrop) s/Str
-                                      (s/optional-key :description) s/Str
-                                      (s/optional-key :length) s/Int}}
+            :put {:parameters {:body {(s/optional-key :runtime) s/Int
+                                      (s/optional-key :genres) [{:id s/Int
+                                                :name s/Str}]
+                                      (s/optional-key :overview) s/Str
+                                      (s/optional-key :title) s/Str
+                                      (s/optional-key :poster_path) s/Str
+                                      (s/optional-key :backdrop_path) s/Str}}
+                  :middleware [[mw/draw-old-data db/get-movie-by-id]
+                               [mw/ToPgJson :genres]]
                   :handler movies/update-movie}
             :delete movies/delete-movie}]])
 

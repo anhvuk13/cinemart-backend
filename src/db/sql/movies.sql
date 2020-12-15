@@ -4,11 +4,12 @@
 -- :doc creates movies table
 CREATE TABLE IF NOT EXISTS movies (
   id SERIAL PRIMARY KEY,
-  name TEXT NOT NULL,
-  poster TEXT,
-  backdrop TEXT,
-  description TEXT,
-  length INT,
+  runtime INT,
+  genres JSON,
+  overview TEXT,
+  title TEXT,
+  poster_path TEXT,
+  backdrop_path TEXT,
   created_at TIMESTAMP NOT NULL DEFAULT current_timestamp
 );
 
@@ -23,15 +24,19 @@ SELECT * FROM movies;
 SELECT * FROM movies
 WHERE id = :id;
 
+-- :name draw-movie :? :1
+INSERT INTO movies (id, runtime, genres, overview, title, poster_path, backdrop_path)
+VALUES (:id, :runtime, :genres, :overview, :title, :poster_path, :backdrop_path)
+RETURNING *;
+
 -- :name insert-movie :? :1
-INSERT INTO movies (name, poster, backdrop, description, length)
-VALUES (:name, :poster, :backdrop, :description, :length)
+INSERT INTO movies (runtime, genres, overview, title, poster_path, backdrop_path)
+VALUES (:runtime, :genres, :overview, :title, :poster_path, :backdrop_path)
 RETURNING *;
 
 -- :name update-movie-by-id :! :1
 UPDATE movies
-SET name = :name, poster = :poster, backdrop = :backdrop,
-description = :description, length = :length
+SET runtime = :runtime, genres = :genres, overview = :overview, title = :title, poster_path = :poster_path, backdrop_path = :backdrop_path
 WHERE id = :id;
 
 -- :name delete-movie-by-id :! :1

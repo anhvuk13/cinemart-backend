@@ -49,6 +49,30 @@
 (create-auth-table config)
 
 (comment
+  (create-test config)
+  (insert-test config {:j (utils.coerce/to-pg-json [{:a 1}])})
+  (type {:a :b})
   (get-managers-by-theater config {:theater 1})
   (get-schedule-by-id config {:id 4})
-  (get-reserved-seats-of-schedule config {:schedule 3}))
+  (get-reserved-seats-of-schedule config {:schedule 3})
+  (get-users config)
+  (get-movies config)
+  (insert-movie config {:runtime 1
+                      :genres (utils.coerce/to-pg-json [{:id 1 :name "a"}])
+                      :overview "alo"
+                      :title "title"
+                      :poster_path "poster"
+                      :backdrop_path "backpath"})
+  (def
+    obj
+    (draw-movie config {:id 123
+                        :runtime 120
+                        :genres
+                        (utils.coerce/to-pg-json
+                        [{:id 123 :name "alice"}
+                         {:id 321 :name "bob"}])
+                        :overview "Hello"
+                        :title "World"
+                        :backdrop_path "/path/to/backdrop"
+                        :poster_path "/path/to/poster"}))
+  (map #(.getValue %) (:genres obj)))

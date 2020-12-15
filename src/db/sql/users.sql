@@ -42,3 +42,13 @@ WHERE id = :id;
 
 -- :name delete-user-by-id :! :1
 DELETE FROM users WHERE id = :id;
+
+-- :name create-test :!
+CREATE TABLE IF NOT EXISTS test (
+  j json
+);
+
+-- :name insert-test :1 :1
+INSERT INTO test (j)
+VALUES (:j)
+RETURNING *;

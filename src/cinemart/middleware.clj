@@ -1,9 +1,11 @@
 (ns cinemart.middleware
   (:require [clojure.string :refer [split]]
+            [clojure.data.json :as json]
             [ring.util.http-response :as res]
             [clj-time.core :as c]
             [clj-time.format :as f]
             [cinemart.db :as db]
+            [utils.coerce :as coerce]
             [cinemart.services :as s]
             [cinemart.auth :as auth]))
 
@@ -125,6 +127,27 @@
            (if (empty? rest)
              (next next-req)
              (recur next-req rest))))) req args)))
+
+(defn ToPgJson [next & args]
+  (fn [req]
+    ((fn [req [key & rest]]
+       (let [val-json (get-in req [:parameters :body key])
+             val (coerce/to-pg-json val-json)
+             next-req (assoc-in req [:parameters :body key] val)]
+         (if (empty? rest)
+           (next next-req)
+           (recur next-req rest)))) req args)))
+
+(defn draw-old-data [next get-db]
+  (fn [req]
+    (let [id (get-in req [:parameters :path])
+          old-data (get-db db/config id)
+          data (get-in req [:parameters :body])]
+      (next
+        (assoc (assoc-in req
+                         [:parameters :body]
+                         (merge old-data data))
+               :old-data old-data)))))
 
 (comment
   ((roles #(println %) "admin" "user" "manager") {:role "manager"})

@@ -1,5 +1,6 @@
-{:paths ["src" "src/db"]
+{:paths ["src" "src/db" "test"]
  :deps {org.clojure/clojure {:mvn/version "1.10.1"}
+        org.clojure/data.json {:mvn/version "1.0.0"}
         metosin/reitit {:mvn/version "0.5.10"}
         metosin/ring-http-response {:mvn/version "0.9.1"}
         metosin/reitit-swagger {:mvn/version "0.5.10"}
