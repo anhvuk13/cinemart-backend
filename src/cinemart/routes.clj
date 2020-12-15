@@ -170,10 +170,10 @@
    ["" {:get {:summary "(admin) get all managers"
               :handler (persons/get-persons "manager")}
         :post {:summary "(admin) create a new manager"
-               :parameters {:body {:theater s/Str
+               :parameters {:body {:theater s/Int
                                    :mail s/Str
                                    :password s/Str}}
-               :middleware [[mw/StrInt? :theater] mw/create-manager]
+               :middleware [mw/create-manager]
                :handler persons/create-manager}}]
    ["/:id" {:parameters {:path {:id s/Int}}
             :get {:summary "(admin) get a specific manager account"
