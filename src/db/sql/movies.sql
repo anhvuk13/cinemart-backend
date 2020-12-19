@@ -107,6 +107,16 @@ select distinct * from json_populate_recordset(
   )
 );
 
+-- :name get-genre-by-id :? :1
+select distinct * from json_populate_recordset(
+  null::genre, (
+    select json_agg(g) g from (
+      select json_array_elements(genres) g from movies
+    ) t
+  )
+)
+where id = :id;
+
 -- :name get-movie-by-id :? :1
 SELECT * FROM movies
 WHERE id = :id;

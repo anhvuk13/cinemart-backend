@@ -80,11 +80,12 @@
     ["/one"
      ["/:id" {:parameters {:path {:id s/Int}}
               :get (fn [{:keys [parameters]}]
-                        (res/ok
-                          {:response
-                           (db/get-movies-by-genre
-                             db/config
-                             (:path parameters))}))}]]
+                     (res/ok
+                       {:response
+                        {:genre (db/get-genre-by-id db/config (:path parameters))
+                         :movies (db/get-movies-by-genre
+                                   db/config
+                                   (:path parameters))}}))}]]
     ["/all" {:get (fn [_]
                     (res/ok
                       {:response
