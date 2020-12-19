@@ -5,6 +5,7 @@
             [reitit.swagger :as swagger]
             [reitit.swagger-ui :as swagger-ui]
             [ring.middleware.cors :refer [wrap-cors]]
+            [ring.middleware.not-modified :refer [wrap-not-modified]]
             [reitit.ring.middleware.exception
              :refer [exception-middleware]]
             [reitit.ring.middleware.parameters
@@ -57,7 +58,8 @@
                          format-request-middleware
                          coerce-exceptions-middleware
                          coerce-request-middleware
-                         coerce-response-middleware]}})
+                         coerce-response-middleware
+                         wrap-not-modified]}})
    (ring/routes
     (swagger-ui/create-swagger-ui-handler {:path "/"})
     (ring/redirect-trailing-slash-handler)

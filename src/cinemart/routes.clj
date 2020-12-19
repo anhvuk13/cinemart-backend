@@ -15,7 +15,7 @@
 
 (def StrInt (s/pred (fn [req]
                       (try (Integer/parseInt req)
-                           (catch Exception e false)))))
+                           (catch Exception e (integer? req))))))
 
 (defn ping-handler [req]
   (res/ok {:ping "pong"}))
@@ -67,19 +67,44 @@
                                     :poster_path s/Str
                                     :backdrop_path s/Str}}
                 :handler movies/draw-movie}}]
-   ["/:id" {:parameters {:path {:id s/Int}}
-            :get movies/get-movie-by-id
-            :put {:parameters {:body {(s/optional-key :runtime) s/Int
-                                      (s/optional-key :genres) [{:id s/Int
-                                                :name s/Str}]
-                                      (s/optional-key :overview) s/Str
-                                      (s/optional-key :title) s/Str
-                                      (s/optional-key :poster_path) s/Str
-                                      (s/optional-key :backdrop_path) s/Str}}
-                  :middleware [[mw/draw-old-data db/get-movie-by-id]
-                               [mw/ToPgJson :genres]]
-                  :handler movies/update-movie}
-            :delete movies/delete-movie}]])
+   ["/latest"
+    ["/from"
+     ["/now" {:get movies/get-movies-from-now}]]
+    ["/:count" {:parameters {:path {:count s/Int}}
+                :get (fn [{:keys [parameters]}]
+                       (res/ok
+                         {:response
+                          (db/get-latest-movies
+                            db/config (:path parameters))}))}]]
+   ["/genres"
+    ["/one"
+     ["/:id" {:parameters {:path {:id s/Int}}
+              :get (fn [{:keys [parameters]}]
+                        (res/ok
+                          {:response
+                           (db/get-movies-by-genre
+                             db/config
+                             (:path parameters))}))}]]
+    ["/all" {:get (fn [_]
+                    (res/ok
+                      {:response
+                       (db/get-genres db/config)}))}]
+    ["/movies" {:get movies/get-movies-of-each-genre}]]
+   ["/:id" {:parameters {:path {:id s/Int}}}
+    ["" {:get movies/get-movie-by-id
+         :put {:parameters {:body {(s/optional-key :runtime) s/Int
+                                   (s/optional-key :genres) [{:id s/Int
+                                                              :name s/Str}]
+                                   (s/optional-key :overview) s/Str
+                                   (s/optional-key :title) s/Str
+                                   (s/optional-key :poster_path) s/Str
+                                   (s/optional-key :backdrop_path) s/Str}}
+               :middleware [[mw/draw-old-data db/get-movie-by-id]
+                            [mw/ToPgJson :genres]]
+               :handler movies/update-movie}
+         :delete movies/delete-movie}]
+    ["/screening"
+     ["/theaters" {:get theaters/get-theaters-screening-this-movie}]]]])
 
 (def theater-routes
   ["/theaters" {:swagger {:tags ["theaters"]}
@@ -107,25 +132,29 @@
                   :description "Only admins have permission to delete a theater."
                   :middleware [mw/token-valid mw/not-expired [mw/roles "admin"]]
                   :handler theaters/delete-theater}}]
-    ["/schedules" {:get {:summary "get all schdules of an theater"
-                         :description "Everyone (without login) can see all schedules belong to a specific theater"
-                         :handler (fn [req]
-                                    (schedules/get-schedules-by-theater
-                                      (assoc-in req [:parameters :body :theater]
-                                                (get-in req [:parameters :path :id]))))}
-                   :post {:summary "(admin|manager) create a schedules"
-                          :description "Admins or managers who managing current theater can create a schedule for it."
-                          :parameters {:body {:movie s/Int
-                                              :room s/Int
-                                              :nrow s/Int
-                                              :ncolumn s/Int
-                                              :price s/Int
-                                              :time s/Str}}
-                          :middleware [mw/token-valid mw/not-expired [mw/roles "admin" "manager"] mw/managing? [mw/StrTime? :time]]
-                          :handler (fn [req]
-                                     (schedules/create-schedule
-                                       (assoc-in req [:parameters :body :theater]
-                                                 (get-in req [:parameters :path :id]))))}}]
+    ["/movies" {:get movies/get-movies-from-now-by-theater}]
+    ["/schedules"
+     ["" {:get {:summary "get all schdules of an theater"
+                :description "Everyone (without login) can see all schedules belong to a specific theater"
+                :handler (fn [req]
+                           (schedules/get-schedules-by-theater
+                             (assoc-in req [:parameters :body :theater]
+                                       (get-in req [:parameters :path :id]))))}
+          :post {:summary "(admin|manager) create a schedules"
+                 :description "Admins or managers who managing current theater can create a schedule for it."
+                 :parameters {:body {:movie s/Int
+                                     :room s/Int
+                                     :nrow s/Int
+                                     :ncolumn s/Int
+                                     :price s/Int
+                                     :time s/Str}}
+                 :middleware [mw/token-valid mw/not-expired [mw/roles "admin" "manager"] mw/managing? [mw/StrTime? :time]]
+                 :handler (fn [req]
+                            (schedules/create-schedule
+                              (assoc-in req [:parameters :body :theater]
+                                        (get-in req [:parameters :path :id]))))}}]
+     ["/:movie" {:parameters {:path {:movie s/Int}}
+                 :get schedules/get-schedule-of-specific-movie-this-theater}]]
     ["/managers" {:get {:summary "(admins) get all schdules belong to a theater"
                         :description "Only admins and managers assigned can see the list of managers working at a specific theater"
                         :middleware [mw/token-valid mw/not-expired [mw/roles "admin" "manager"] mw/managing?]
@@ -146,7 +175,7 @@
                                    :username s/Str
                                    :password s/Str
                                    :mail s/Str}}
-               :middleware [mw/create-user]
+               :middleware [[mw/StrTime? :dob] mw/create-user]
                :handler (persons/create-person "user")}}]
    ["/:id" {:parameters {:path {:id s/Int}}
             :get {:summary "(admin) get a specific user account"
@@ -158,7 +187,7 @@
                                       (s/optional-key :username) s/Str
                                       (s/optional-key :password) s/Str
                                       (s/optional-key :mail) s/Str}}
-                  :middleware [mw/hashpass]
+                  :middleware [[mw/draw-old-data db/get-user-by-id] [mw/StrTime? :dob] mw/hashpass]
                   :handler (persons/update-person "user")}
             :delete {:summary "(admin) delete a user account"
                      :handler (persons/delete-person "user")}}]])
@@ -344,6 +373,6 @@
                                                        :password s/Str
                                                        :dob s/Str
                                                        :fullname s/Str}}
-                                   :middleware [mw/create-user mw/hashpass]
+                                   :middleware [[mw/StrTime? :dob] mw/create-user mw/hashpass]
                                    :handler (fn [req]
                                               (auth/register req "user"))}}])

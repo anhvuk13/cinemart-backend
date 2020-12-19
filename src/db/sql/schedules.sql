@@ -30,39 +30,94 @@ CREATE TABLE IF NOT EXISTS schedules (
 DROP TABLE IF EXISTS schedules;
 
 -- :name get-schedules :? :*
-SELECT * FROM schedules
-ORDER BY time DESC;
+SELECT s.id, s.movie, s.theater, s.nrow, s.ncolumn, s.price, s.time, s.reserved, s.created_at,
+array_agg(t.seat) reserved_seats, array_agg(t.seat_name) reserved_seats_name,
+m.id movie_id, m.runtime movie_runtime, m.genres movie_genres, m.overview movie_overview,
+m.title movie_title, m.poster_path movie_poster_path, m.backdrop_path movie_backdrop_path
+FROM schedules s
+FULL OUTER JOIN invoices i ON i.schedule = s.id
+FULL OUTER JOIN tickets t ON t.invoice = i.id
+INNER JOIN movies m ON s.movie = m.id
+GROUP BY s.id, s.movie, s.theater, s.nrow, s.ncolumn, s.price, s.time, s.reserved, s.created_at,
+movie_id, movie_runtime, movie_overview, movie_title, movie_poster_path, movie_backdrop_path
+ORDER BY s.time DESC;
 
 -- :name get-schedules-by-week :? :*
-SELECT * FROM schedules
-WHERE extract(year from time) = :year
-AND extract(month from time) = :month
-AND extract(week from time) = :week
-ORDER BY time DESC;
+SELECT s.id, s.movie, s.theater, s.nrow, s.ncolumn, s.price, s.time, s.reserved, s.created_at,
+array_agg(t.seat) reserved_seats, array_agg(t.seat_name) reserved_seats_name,
+m.id movie_id, m.runtime movie_runtime, m.genres movie_genres, m.overview movie_overview,
+m.title movie_title, m.poster_path movie_poster_path, m.backdrop_path movie_backdrop_path
+FROM schedules s
+FULL OUTER JOIN invoices i ON i.schedule = s.id
+FULL OUTER JOIN tickets t ON t.invoice = i.id
+INNER JOIN movies m ON s.movie = m.id
+WHERE extract(year from s.time) = :year
+AND extract(month from s.time) = :month
+AND extract(week from s.time) = :week
+GROUP BY s.id, s.movie, s.theater, s.nrow, s.ncolumn, s.price, s.time, s.reserved, s.created_at,
+movie_id, movie_runtime, movie_overview, movie_title, movie_poster_path, movie_backdrop_path
+ORDER BY s.time DESC;
 
 -- :name get-schedules-by-date :? :*
-SELECT * FROM schedules
-WHERE extract(year from time) = :year
-AND extract(month from time) = :month
-AND extract(week from time) = :week
-AND extract(day from time) = :day
-ORDER BY time DESC;
+SELECT s.id, s.movie, s.theater, s.nrow, s.ncolumn, s.price, s.time, s.reserved, s.created_at,
+array_agg(t.seat) reserved_seats, array_agg(t.seat_name) reserved_seats_name,
+m.id movie_id, m.runtime movie_runtime, m.genres movie_genres, m.overview movie_overview,
+m.title movie_title, m.poster_path movie_poster_path, m.backdrop_path movie_backdrop_path
+FROM schedules s
+FULL OUTER JOIN invoices i ON i.schedule = s.id
+FULL OUTER JOIN tickets t ON t.invoice = i.id
+INNER JOIN movies m ON s.movie = m.id
+WHERE extract(year from s.time) = :year
+AND extract(month from s.time) = :month
+AND extract(week from s.time) = :week
+AND extract(day from s.time) = :day
+GROUP BY s.id, s.movie, s.theater, s.nrow, s.ncolumn, s.price, s.time, s.reserved, s.created_at,
+movie_id, movie_runtime, movie_overview, movie_title, movie_poster_path, movie_backdrop_path
+ORDER BY s.time DESC;
 
 -- :name get-schedules-by-theater :? :*
-SELECT * FROM schedules
-WHERE theater = :theater
-ORDER BY time DESC;
+SELECT s.id, s.movie, s.theater, s.nrow, s.ncolumn, s.price, s.time, s.reserved, s.created_at,
+array_agg(t.seat) reserved_seats, array_agg(t.seat_name) reserved_seats_name,
+m.id movie_id, m.runtime movie_runtime, m.genres movie_genres, m.overview movie_overview,
+m.title movie_title, m.poster_path movie_poster_path, m.backdrop_path movie_backdrop_path
+FROM schedules s
+FULL OUTER JOIN invoices i ON i.schedule = s.id
+FULL OUTER JOIN tickets t ON t.invoice = i.id
+INNER JOIN movies m ON s.movie = m.id
+WHERE s.theater = :theater
+GROUP BY s.id, s.movie, s.theater, s.nrow, s.ncolumn, s.price, s.time, s.reserved, s.created_at,
+movie_id, movie_runtime, movie_overview, movie_title, movie_poster_path, movie_backdrop_path
+ORDER BY s.time DESC;
+
+-- :name get-schedules-by-theater-and-movie :? :*
+SELECT s.id, s.movie, s.theater, s.nrow, s.ncolumn, s.price, s.time, s.reserved, s.created_at,
+array_agg(t.seat) reserved_seats, array_agg(t.seat_name) reserved_seats_name,
+m.id movie_id, m.runtime movie_runtime, m.genres movie_genres, m.overview movie_overview,
+m.title movie_title, m.poster_path movie_poster_path, m.backdrop_path movie_backdrop_path
+FROM schedules s
+FULL OUTER JOIN invoices i ON i.schedule = s.id
+FULL OUTER JOIN tickets t ON t.invoice = i.id
+INNER JOIN movies m ON s.movie = m.id
+INNER JOIN theaters th ON s.theater = th.id
+WHERE th.id = :id AND m.id = :movie
+GROUP BY s.id, s.movie, s.theater, s.nrow, s.ncolumn, s.price, s.time, s.reserved, s.created_at,
+movie_id, movie_runtime, movie_overview, movie_title, movie_poster_path, movie_backdrop_path
+ORDER BY s.time DESC;
 
 -- :name get-schedule-by-id :? :1
 --SELECT * FROM schedules
 --WHERE id = :id;
 SELECT s.id, s.movie, s.theater, s.nrow, s.ncolumn, s.price, s.time, s.reserved, s.created_at,
-array_agg(t.seat) reserved_seats, array_agg(t.seat_name) reserved_seats_name
+array_agg(t.seat) reserved_seats, array_agg(t.seat_name) reserved_seats_name,
+m.id movie_id, m.runtime movie_runtime, m.genres movie_genres, m.overview movie_overview,
+m.title movie_title, m.poster_path movie_poster_path, m.backdrop_path movie_backdrop_path
 FROM schedules s
 FULL OUTER JOIN invoices i ON i.schedule = s.id
 FULL OUTER JOIN tickets t ON t.invoice = i.id
+INNER JOIN movies m ON s.movie = m.id
 WHERE s.id = :id
-GROUP BY s.id, s.movie, s.theater, s.nrow, s.ncolumn, s.price, s.time, s.reserved, s.created_at;
+GROUP BY s.id, s.movie, s.theater, s.nrow, s.ncolumn, s.price, s.time, s.reserved, s.created_at,
+movie_id, movie_runtime, movie_overview, movie_title, movie_poster_path, movie_backdrop_path;
 
 -- :name insert-schedule :? :1
 INSERT INTO schedules (movie, theater, room, nrow, ncolumn, price, time)

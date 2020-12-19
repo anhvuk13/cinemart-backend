@@ -1,30 +1,15 @@
 (ns cinemart.services
   (:require [custom.config :as c]
             [cinemart.db :as db]
-            [clojure.data.json :as json]
             [buddy.hashers :as h]
             [buddy.sign.jwt :as jwt])
   (:import java.util.Date))
 
 (defn parse-int [number-string]
-  (try (Integer/parseInt number-string)
-       (catch Exception e nil)))
-
-(defn pgjson-to-json [req [key & rest]]
-  (let [pgjson (get-in req [key])
-        val (map (fn [arg] ((comp json/read-str #(.getValue %)) arg)) pgjson)
-        next-req (assoc-in req [key] val)]
-    (if (empty? rest)
-      next-req
-      (recur next-req rest))))
-
-(defn json-stringify [json-array]
-  (filter string? (map
-                    (fn [json]
-                      (if (map? json)
-                        (json/write-str json)
-                        nil))
-                    json-array)))
+  (if (int? number-string)
+    number-string
+    (try (Integer/parseInt number-string)
+         (catch Exception e nil))))
 
 (def secret c/secret)
 (def token-valid c/token-valid)

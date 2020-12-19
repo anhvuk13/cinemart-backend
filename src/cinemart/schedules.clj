@@ -1,6 +1,7 @@
 (ns cinemart.schedules
   (:require [ring.util.http-response :as res]
             [clj-time.core :as t]
+            [clj-time.format :as f]
             [cinemart.db :as db]))
 
 (defn get-schedules [_]
@@ -38,17 +39,23 @@
         week (t/week-number-of-year now)
         day (t/day now)
         all (db/get-schedules-by-theater db/config {:theater theater})
-        by-week (filter (fn [{:keys [time]}]
-                          (and (= year (t/year time))
-                               (= month (t/month time))
-                               (= week (t/week-number-of-year (t/now)))))
+        by-week (filter (fn [schedule]
+                          (let [time (f/parse (:time schedule))]
+                            (and (= year (t/year time))
+                                 (= month (t/month time))
+                                 (= week (t/week-number-of-year time)))))
                         all)
-        by-day (filter (fn [{:keys [time]}]
-                         (= day (t/day time)))
+        by-day (filter (fn [schedule]
+                         (let [time (f/parse (:time schedule))]
+                           (= day (t/day time))))
                        by-week)]
     (res/ok {:response {:all all
                         :week by-week
                         :day by-day}})))
+
+(defn get-schedule-of-specific-movie-this-theater [{:keys [parameters]}]
+  (res/ok
+    {:response (db/get-schedules-by-theater-and-movie db/config (:path parameters))}))
 
 (defn create-schedule [{:keys [parameters]}]
   (let [data (:body parameters)
@@ -59,7 +66,7 @@
       (res/not-found {:error "movie or theater invalid"})
       (let [schedule (db/insert-schedule db/config data)]
         (res/created (str "/schedules/" (:id schedule))
-                     {:response schedule})))))
+                     {:response (db/get-schedule-by-id db/config schedule)})))))
 
 (defn get-schedule-by-id [{:keys [parameters]}]
   (let [id (:path parameters)

@@ -1,3 +1,10 @@
+;;(get-admin-by-id config {:id 4})
+;;(update-admin-by-id config {:id 4,
+;;                            :dob nil,
+;;                            :password
+;;                            "bcrypt+sha512$7690d2633f3a42c238a5ba01088d376b$12$e9e953a01f3fa040e5b78de35993be79d23d53a67682c023",
+;;                            :mail "admin@cinemart.com",
+;;                            :created_at (clj-time.format/parse "2020-12-06T16:28:26.752Z")})
 (ns cinemart.db
   (:require [custom.config :as c]
             [utils.coerce]
@@ -49,6 +56,13 @@
 (create-auth-table config)
 
 (comment
+  (delete-user-by-id config {:id 4})
+  (get-users config)
+  (insert-user config {:fullname ""
+                       :dob (clj-time.core/now)
+                       :username ""
+                       :password ""
+                       :mail ""})
   (create-test config)
   (insert-test config {:j (utils.coerce/to-pg-json [{:a 1}])})
   (type {:a :b})
@@ -57,6 +71,7 @@
   (get-reserved-seats-of-schedule config {:schedule 3})
   (get-users config)
   (get-movies config)
+  (delete-user-by-id config {:id 1})
   (insert-movie config {:runtime 1
                       :genres (utils.coerce/to-pg-json [{:id 1 :name "a"}])
                       :overview "alo"

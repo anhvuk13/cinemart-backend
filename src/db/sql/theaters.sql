@@ -20,6 +20,12 @@ SELECT * FROM theaters;
 SELECT * FROM theaters
 WHERE id = :id;
 
+-- :name get-theaters-by-movie :? :*
+SELECT DISTINCT t.id, t.name, t.address, t.created_at FROM theaters t
+INNER JOIN schedules s ON s.theater = t.id
+INNER JOIN movies m ON s.movie = m.id
+WHERE m.id = :id;
+
 -- :name insert-theater :? :1
 INSERT INTO theaters (name, address)
 VALUES (:name, :address)

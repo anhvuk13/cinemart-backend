@@ -15,6 +15,7 @@
   (let [data (get-in req [:parameters :body])
         user (-> data
                  ((partial db/insert-user db/config))
+                 ((partial db/get-user-by-id db/config))
                  ((partial s/add-token req) role))]
     (res/created
      (str "/users/" (:id user))

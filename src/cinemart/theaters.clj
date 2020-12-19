@@ -4,7 +4,8 @@
             [ring.util.http-response :as res]))
 
 (defn get-theaters
-  [_]
+  [{:keys [parameters]}]
+  (println parameters)
   (res/ok {:response (db/get-theaters db/config)}))
 
 (defn get-theater-by-id
@@ -14,6 +15,9 @@
     (if theater
       (res/ok {:response theater})
       (res/not-found {:error "Theater not found"}))))
+
+(defn get-theaters-screening-this-movie [{:keys [parameters]}]
+  (res/ok {:response (db/get-theaters-by-movie db/config (:path parameters))}))
 
 (defn create-theater [{:keys [parameters]}]
   (let [theater-info (get-in parameters [:body :theater])

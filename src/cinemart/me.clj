@@ -1,5 +1,6 @@
 (ns cinemart.me
   (:require [ring.util.http-response :as res]
+            [clj-time.format :as f]
             [cinemart.db :as db]
             [cinemart.services :as s]))
 
@@ -13,13 +14,17 @@
         id (:id me)
         [get-db update-db _] (s/get-func-by-role role)
         update-data (get-in req [:parameters :body])
-        updated-data (merge me update-data)
-        updated-count (update-db db/config updated-data)]
+        data (merge me update-data)
+        ca (f/parse (:created_at data))
+        dob (f/parse (:dob data))
+        updated-data (assoc data :created_at ca :dob dob)
+        updated-count (update-db db/config updated-data)
+        new-data (get-db db/config {:id id})]
     (if (= 1 updated-count)
       (do
         (s/revoke-all-tokens id role [])
         (res/ok {:updated true
-                 :response (s/add-token updated-data role)}))
+                 :response (s/add-token req new-data role)}))
       (res/not-found {:updated false
                       :error (str "Unable to update " role)}))))
 

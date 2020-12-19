@@ -1,6 +1,5 @@
 (ns cinemart.middleware
   (:require [clojure.string :refer [split]]
-            [clojure.data.json :as json]
             [ring.util.http-response :as res]
             [clj-time.core :as c]
             [clj-time.format :as f]
@@ -28,11 +27,10 @@
 
 (defn create-manager [next]
   (fn [req]
-    (let [id (get-in req [:parameters :body :theater])
-          nreq (assoc-in req [:parameters :body :theater] id)]
-      (if (not (db/get-theater-by-id db/config {:id id}))
+    (let [id (get-in req [:parameters :body :theater])]
+      (if (empty? (db/get-theater-by-id db/config {:id id}))
         (res/bad-request {:error "theater not exists"})
-        (create-person nreq next db/get-manager-by-mail)))))
+        (create-person req next db/get-manager-by-mail)))))
 
 (defn create-admin [next]
   (fn [req]

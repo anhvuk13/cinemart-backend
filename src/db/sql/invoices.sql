@@ -65,33 +65,45 @@ DROP TABLE IF EXISTS invoices;
 -- :name get-invoices :? :*
 --SELECT * FROM invoices;
 SELECT i.id, i.user_id, i.schedule, i.paid, i.cost, i.tickets_count, i.created_at,
-array_agg(t.seat) seats, array_agg(t.seat_name) seats_name
+array_agg(t.seat) seats, array_agg(t.seat_name) seats_name,
+m.id movie_id, m.runtime movie_runtime, m.genres movie_genres, m.overview movie_overview, m.title movie_title, m.poster_path movie_poster_path, m.backdrop_path movie_backdrop_path, s.id schedule_id, s.room schedule_room, s.nrow schedule_nrow, s.ncolumn schedule_ncolumn, s.time schedule_time, s.reserved schedule_reserved, th.id theater_id, th.name theater_name, th.address theater_address
 FROM invoices i
-FULL OUTER JOIN tickets t
-ON t.invoice = i.id
-GROUP BY i.id, i.user_id, i.schedule, i.paid, i.cost, i.tickets_count, i.created_at;
+FULL OUTER JOIN tickets t ON t.invoice = i.id
+INNER JOIN schedules s ON i.schedule = s.id
+INNER JOIN theaters th ON s.theater = th.id
+INNER JOIN movies m ON s.movie = m.id
+GROUP BY i.id, i.user_id, i.schedule, i.paid, i.cost, i.tickets_count, i.created_at,
+movie_id, movie_runtime, movie_overview, movie_title, movie_poster_path, movie_backdrop_path, schedule_id, schedule_room, schedule_nrow, schedule_ncolumn, schedule_time, schedule_reserved, theater_id, theater_name, theater_address;
 
 -- :name get-invoices-by-user :? :*
 --SELECT * FROM invoices
 --WHERE user_id = :user_id;
 SELECT i.id, i.user_id, i.schedule, i.paid, i.cost, i.tickets_count, i.created_at,
-array_agg(t.seat) seats, array_agg(t.seat_name) seats_name
+array_agg(t.seat) seats, array_agg(t.seat_name) seats_name,
+m.id movie_id, m.runtime movie_runtime, m.genres movie_genres, m.overview movie_overview, m.title movie_title, m.poster_path movie_poster_path, m.backdrop_path movie_backdrop_path, s.id schedule_id, s.room schedule_room, s.nrow schedule_nrow, s.ncolumn schedule_ncolumn, s.time schedule_time, s.reserved schedule_reserved, th.id theater_id, th.name theater_name, th.address theater_address
 FROM invoices i
-FULL OUTER JOIN tickets t
-ON t.invoice = i.id
+FULL OUTER JOIN tickets t ON t.invoice = i.id
+INNER JOIN schedules s ON i.schedule = s.id
+INNER JOIN theaters th ON s.theater = th.id
+INNER JOIN movies m ON s.movie = m.id
 WHERE user_id = :user_id
-GROUP BY i.id, i.user_id, i.schedule, i.paid, i.cost, i.tickets_count, i.created_at;
+GROUP BY i.id, i.user_id, i.schedule, i.paid, i.cost, i.tickets_count, i.created_at,
+movie_id, movie_runtime, movie_overview, movie_title, movie_poster_path, movie_backdrop_path, schedule_id, schedule_room, schedule_nrow, schedule_ncolumn, schedule_time, schedule_reserved, theater_id, theater_name, theater_address;
 
 -- :name get-invoice-by-id :? :1
 --SELECT * FROM invoices
 --WHERE id = :id;
 SELECT i.id, i.user_id, i.schedule, i.paid, i.cost, i.tickets_count, i.created_at,
-array_agg(t.seat) seats, array_agg(t.seat_name) seats_name
+array_agg(t.seat) seats, array_agg(t.seat_name) seats_name,
+m.id movie_id, m.runtime movie_runtime, m.genres movie_genres, m.overview movie_overview, m.title movie_title, m.poster_path movie_poster_path, m.backdrop_path movie_backdrop_path, s.id schedule_id, s.room schedule_room, s.nrow schedule_nrow, s.ncolumn schedule_ncolumn, s.time schedule_time, s.reserved schedule_reserved, th.id theater_id, th.name theater_name, th.address theater_address
 FROM invoices i
-FULL OUTER JOIN tickets t
-ON t.invoice = i.id
+FULL OUTER JOIN tickets t ON t.invoice = i.id
+INNER JOIN schedules s ON i.schedule = s.id
+INNER JOIN theaters th ON s.theater = th.id
+INNER JOIN movies m ON s.movie = m.id
 WHERE i.id = :id
-GROUP BY i.id, i.user_id, i.schedule, i.paid, i.cost, i.tickets_count, i.created_at;
+GROUP BY i.id, i.user_id, i.schedule, i.paid, i.cost, i.tickets_count, i.created_at,
+movie_id, movie_runtime, movie_overview, movie_title, movie_poster_path, movie_backdrop_path, schedule_id, schedule_room, schedule_nrow, schedule_ncolumn, schedule_time, schedule_reserved, theater_id, theater_name, theater_address;
 
 -- :name insert-invoice :? :1
 INSERT INTO invoices (user_id, schedule)

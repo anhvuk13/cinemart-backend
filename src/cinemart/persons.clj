@@ -41,13 +41,14 @@
           [get-db update-db _] (s/get-func-by-role role)
           old-data (get-db db/config id)
           account (merge old-data (:body parameters) id)
-          updated-count (update-db db/config account)]
+          updated-count (update-db db/config account)
+          after-updated (get-db db/config id)]
       (if (= 1 updated-count)
         (do
           (s/revoke-all-tokens id role [])
           (res/ok {:updated true
                    :response {:before-updated (dissoc old-data :password)
-                              :after-updated (dissoc account :password)}}))
+                              :after-updated (dissoc after-updated :password)}}))
         (res/not-found
          {:updated false
           :error (str "unable to update " role)})))))
@@ -69,6 +70,7 @@
            :error (str "unable to delete " role)})))))
 
 (defn create-manager [{:keys [parameters]}]
+  (println (:body parameters))
   (let [data (:body parameters)
         account (-> data
                     (s/hashpass)
