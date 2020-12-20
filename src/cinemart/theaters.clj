@@ -5,7 +5,6 @@
 
 (defn get-theaters
   [{:keys [parameters]}]
-  (println parameters)
   (res/ok {:response (db/get-theaters db/config)}))
 
 (defn get-theater-by-id

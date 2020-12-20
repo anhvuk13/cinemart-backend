@@ -92,6 +92,10 @@
   (app {:request-method :post
         :uri "/login"
         :body "{ \"mail\": \"john@doe\", \"password\": \"password\"}"})
+  (app {:request-method :put
+        :url "/me"
+        :body "{}"
+        :header "{\"authorization\": \"eyJhbGciOiJIUzI1NiJ9.eyJyb2xlIjoibWFuYWdlciIsInVzZXItYWdlbnQiOiJNb3ppbGxhLzUuMCAoWDExOyBMaW51eCB4ODZfNjQpIEFwcGxlV2ViS2l0LzUzNy4zNiAoS0hUTUwsIGxpa2UgR2Vja28pIENocm9tZS84Ny4wLjQyODAuMTAxIFNhZmFyaS81MzcuMzYiLCJtYWlsIjoibG90dGVAbWFuYWdlci5jb20iLCJleHBpcmUiOjE2MDg0NzM3NTUzNjEsInRoZWF0ZXJfYWRkcmVzcyI6IkluIHRoZSBjbG91ZCIsImlkIjoxLCJ0aGVhdGVyX25hbWUiOiJMT1RURXJ5IENpbmVtYXJzIiwidGhlYXRlcl9pZCI6MSwiY3JlYXRlZF9hdCI6IjIwMjAtMTItMThUMTY6MTE6NDMuNzE0WiJ9.y-X5YN6W4ADuM4xTVZi6a_q3e-ThoGM80f7z_rkrH3A\"}"})
   (app {:request-method :get
         :uri "/theaters/3/schedules"})
   (restart-server))

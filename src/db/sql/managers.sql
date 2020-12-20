@@ -32,25 +32,23 @@ WHERE t.id = :theater;
 
 -- :name get-manager-by-id :? :1
 SELECT mr.id, mr.mail, mr.password, mr.created_at,
-array_agg(t.id) theater_id,
-array_agg(t.name) theater_name,
-array_agg(t.address) theater_address
+t.id theater_id,
+t.name theater_name,
+t.address theater_address
 FROM managers mr
 FULL OUTER JOIN management mt ON mr.id = mt.manager
 FULL OUTER JOIN theaters t ON mt.theater = t.id
-WHERE mr.id = :id
-GROUP BY mr.id, mr.mail, mr.created_at;
+WHERE mr.id = :id;
 
 -- :name get-manager-by-mail :? :1
 SELECT mr.id, mr.mail, mr.password, mr.created_at,
-array_agg(t.id) theater_id,
-array_agg(t.name) theater_name,
-array_agg(t.address) theater_address
+t.id theater_id,
+t.name theater_name,
+t.address theater_address
 FROM managers mr
 FULL OUTER JOIN management mt ON mr.id = mt.manager
 FULL OUTER JOIN theaters t ON mt.theater = t.id
-WHERE mr.mail = :mail
-GROUP BY mr.id, mr.mail, mr.created_at;
+WHERE mr.mail = :mail;
 
 -- :name insert-manager :? :1
 INSERT INTO managers (password, mail)

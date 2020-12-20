@@ -70,7 +70,6 @@
            :error (str "unable to delete " role)})))))
 
 (defn create-manager [{:keys [parameters]}]
-  (println (:body parameters))
   (let [data (:body parameters)
         account (-> data
                     (s/hashpass)
