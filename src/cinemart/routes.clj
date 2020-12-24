@@ -100,7 +100,8 @@
                                    (s/optional-key :title) s/Str
                                    (s/optional-key :poster_path) s/Str
                                    (s/optional-key :backdrop_path) s/Str}}
-               :middleware [[mw/draw-old-data db/get-movie-by-id]
+               :middleware [mw/movie-img
+                            [mw/draw-old-data db/get-movie-by-id]
                             [mw/ToPgJson :genres]]
                :handler movies/update-movie}
          :delete movies/delete-movie}]
