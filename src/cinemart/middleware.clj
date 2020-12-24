@@ -20,9 +20,10 @@
   (fn [req]
     (let [raw-movie (get-in req [:parameters :body])
           path (if (= (str (last server-path) "/")) (join (drop-last server-path)) server-path)
-          img (str path "/assets/Untitled.png");
-          poster_path (if (empty? (:poster_path raw-movie)) img (:poster_path raw-movie))
-          backdrop_path (if (empty? (:backdrop_path raw-movie)) img (:backdrop_path raw-movie))]
+          poster (str path "/assets/poster.png");
+          backdrop (str path "/assets/backdrop.png")
+          poster_path (if (empty? (:poster_path raw-movie)) poster (:poster_path raw-movie))
+          backdrop_path (if (empty? (:backdrop_path raw-movie)) backdrop (:backdrop_path raw-movie))]
       (next (update-in req [:parameters :body] assoc :poster_path poster_path :backdrop_path backdrop_path)))))
 
 (defn create-person [req next get-by-mail]
