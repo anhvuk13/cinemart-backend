@@ -56,6 +56,18 @@
 (create-auth-table config)
 
 (comment
+  (get-schedules config)
+  (get-schedule-by-id config {:id 1})
+  (get-schedules-by-theater-and-movie config {:id 1
+                                              :movie 335984})
+  (get-schedules-by-theater config {:theater 1})
+  (get-schedules-by-week config {:year 2020
+                                :month 12
+                                :week 51})
+  (get-schedules-by-date config {:year 2020
+                                :month 12
+                                :week 51
+                                :day 19})
   (delete-user-by-id config {:id 4})
   (get-users config)
   (insert-user config {:fullname ""
