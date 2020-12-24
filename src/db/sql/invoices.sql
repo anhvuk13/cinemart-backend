@@ -73,7 +73,8 @@ INNER JOIN schedules s ON i.schedule = s.id
 INNER JOIN theaters th ON s.theater = th.id
 INNER JOIN movies m ON s.movie = m.id
 GROUP BY i.id, i.user_id, i.schedule, i.paid, i.cost, i.tickets_count, i.created_at,
-movie_id, movie_runtime, movie_overview, movie_title, movie_poster_path, movie_backdrop_path, schedule_id, schedule_room, schedule_nrow, schedule_ncolumn, schedule_time, schedule_reserved, theater_id, theater_name, theater_address;
+movie_id, movie_runtime, movie_overview, movie_title, movie_poster_path, movie_backdrop_path, schedule_id, schedule_room, schedule_nrow, schedule_ncolumn, schedule_time, schedule_reserved, theater_id, theater_name, theater_address
+ORDER BY created_at DESC;
 
 -- :name get-invoices-by-user :? :*
 --SELECT * FROM invoices
@@ -88,7 +89,8 @@ INNER JOIN theaters th ON s.theater = th.id
 INNER JOIN movies m ON s.movie = m.id
 WHERE user_id = :user_id
 GROUP BY i.id, i.user_id, i.schedule, i.paid, i.cost, i.tickets_count, i.created_at,
-movie_id, movie_runtime, movie_overview, movie_title, movie_poster_path, movie_backdrop_path, schedule_id, schedule_room, schedule_nrow, schedule_ncolumn, schedule_time, schedule_reserved, theater_id, theater_name, theater_address;
+movie_id, movie_runtime, movie_overview, movie_title, movie_poster_path, movie_backdrop_path, schedule_id, schedule_room, schedule_nrow, schedule_ncolumn, schedule_time, schedule_reserved, theater_id, theater_name, theater_address
+ORDER BY created_at DESC;
 
 -- :name get-invoice-by-id :? :1
 --SELECT * FROM invoices
