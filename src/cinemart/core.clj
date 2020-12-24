@@ -32,6 +32,7 @@
              :swagger {:info {:title "cinemart-api"}
                        :basePath "/"} ;; prefix for all paths
              :handler (swagger/create-swagger-handler)}}]
+     r/assets-routes
      r/register
      r/login
      r/logout

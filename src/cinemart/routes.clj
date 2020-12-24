@@ -1,6 +1,7 @@
 (ns cinemart.routes
   (:require [schema.core :as s]
             [reitit.swagger :as swagger]
+            [reitit.ring :as ring]
             [ring.util.http-response :as res]
             [cinemart.db :as db]
             [cinemart.middleware :as mw]
@@ -16,6 +17,9 @@
 (def StrInt (s/pred (fn [req]
                       (try (Integer/parseInt req)
                            (catch Exception e (integer? req))))))
+
+(def assets-routes
+["/assets/*" (ring/create-resource-handler)])
 
 (defn ping-handler [req]
   (res/ok {:ping "pong"}))
