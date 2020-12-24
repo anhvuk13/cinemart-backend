@@ -1,5 +1,8 @@
 (ns custom.config)
 
+;; backend server
+(def server-path "http://localhost:4000/")
+
 ;; secret key to sign jwt
 (def secret "secret")
 

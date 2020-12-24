@@ -14,12 +14,8 @@
             [cinemart.invoices :as invoices]
             [cinemart.tickets :as tickets]))
 
-(def StrInt (s/pred (fn [req]
-                      (try (Integer/parseInt req)
-                           (catch Exception e (integer? req))))))
-
 (def assets-routes
-["/assets/*" (ring/create-resource-handler)])
+  ["/assets/*" (ring/create-resource-handler)])
 
 (defn ping-handler [req]
   (res/ok {:ping "pong"}))
@@ -52,7 +48,7 @@
 (def movie-routes
   ["/movies" {:swagger {:tags ["movies"]}}
    ["" {:get movies/get-movies
-        :post {:middleware [[mw/ToPgJson :genres]]
+        :post {:middleware [mw/movie-img [mw/ToPgJson :genres]]
                :parameters {:body {:runtime s/Int
                                    :genres [{:id s/Int
                                              :name s/Str}]
@@ -61,7 +57,7 @@
                                    :poster_path s/Str
                                    :backdrop_path s/Str}}
                :handler movies/create-movie}
-        :patch {:middleware [[mw/ToPgJson :genres]]
+        :patch {:middleware [mw/movie-img [mw/ToPgJson :genres]]
                 :parameters {:body {:id s/Int
                                     :runtime s/Int
                                     :genres [{:id s/Int
