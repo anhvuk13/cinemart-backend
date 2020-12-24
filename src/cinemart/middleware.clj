@@ -20,7 +20,7 @@
   (fn [req]
     (let [raw-movie (get-in req [:parameters :body])
           path (if (= (str (last server-path) "/")) (join (drop-last server-path)) server-path)
-          poster (str path "/assets/poster.png");
+          poster (str path "/assets/poster.jpg");
           backdrop (str path "/assets/backdrop.png")
           poster_path (if (empty? (:poster_path raw-movie)) poster (:poster_path raw-movie))
           backdrop_path (if (empty? (:backdrop_path raw-movie)) backdrop (:backdrop_path raw-movie))]
