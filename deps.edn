@@ -1,4 +1,4 @@
-{:paths ["src" "src/db" "test"]
+{:paths ["src" "src/db" "test" "resources"]
  :deps {org.clojure/clojure {:mvn/version "1.10.1"}
         metosin/reitit {:mvn/version "0.5.10"}
         metosin/ring-http-response {:mvn/version "0.9.1"}
