@@ -2,6 +2,15 @@
 
 Just a simple web server written in [Clojure](https://clojure.org/)
 
+## Demo
+
+- Web: https://cinemart.duckdns.org (Thanks to [violeine](https://github.com/violeine))
+- APIs Doc: https://api.cinemart.duckdns.org (Powered by [Swagger](https://swagger.io))
+
+## Ref.
+
+- [cinemart-frontend](https://github.com/violeine/cinemart-frontend) by [violeine](https://github.com/violeine)
+
 ## Run
 
 - Download dependencies
@@ -60,21 +69,7 @@ docker-compose down
 docker exec -it cinemart_db psql -U postgres
 ```
 
-## APIs
-
-- Documentation at [localhost](http://localhost:4000)
-- Powered by [Swagger](https://swagger.io)
-
-## Demo
-
-- Server at https://violeine.duckdns.org
-- Thanks to [violeine](https://github.com/violeine)
-
 ## Authors
 
 - [violeine](https://github.com/violeine)
 - [me](https://github.com/anhvuk13)
-
-## Ref.
-
-- [cinemart-frontend](https://github.com/violeine/cinemart-frontend) by [violeine](https://github.com/violeine)
