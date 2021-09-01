@@ -4,9 +4,8 @@ Just a simple web server written in [Clojure](https://clojure.org/)
 
 ## Demo
 
-- Web: https://violeine.github.io/cinemart (Thanks to [violeine](https://github.com/violeine))
-- Server + APIs Doc: https://cinemart-backend.herokuapp.com (Powered by [Heroku](https://heroku.com) & [Swagger](https://swagger.io))
-- View [INFO.md](https://github.com/anhvuk13/cinemart-backend/tree/main/INFO.md) for accounts to login
+- Web: https://cinemart.duckdns.org (Thanks to [violeine](https://github.com/violeine))
+- APIs Doc: https://api.cinemart.duckdns.org (Powered by [Swagger](https://swagger.io))
 
 ## Ref.
 
@@ -74,4 +73,3 @@ docker exec -it cinemart_db psql -U postgres
 
 - [violeine](https://github.com/violeine)
 - [me](https://github.com/anhvuk13)
-

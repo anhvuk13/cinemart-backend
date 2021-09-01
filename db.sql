@@ -1,162 +1,4 @@
---
--- PostgreSQL database cluster dump
---
-
-SET default_transaction_read_only = off;
-
-SET client_encoding = 'UTF8';
-SET standard_conforming_strings = on;
-
---
--- Drop databases (except postgres and template1)
---
-
-DROP DATABASE cinemart;
-DROP DATABASE test;
-
-
-
-
---
--- Drop roles
---
-
-DROP ROLE postgres;
-
-
---
--- Roles
---
-
-CREATE ROLE postgres;
-ALTER ROLE postgres WITH SUPERUSER INHERIT CREATEROLE CREATEDB LOGIN REPLICATION BYPASSRLS PASSWORD 'md53175bce1d3201d16594cebf9d7eb3f9d';
-
-
-
-
-
-
---
--- Databases
---
-
---
--- Database "template1" dump
---
-
---
--- PostgreSQL database dump
---
-
--- Dumped from database version 13.1 (Debian 13.1-1.pgdg100+1)
--- Dumped by pg_dump version 13.1 (Debian 13.1-1.pgdg100+1)
-
-SET statement_timeout = 0;
-SET lock_timeout = 0;
-SET idle_in_transaction_session_timeout = 0;
-SET client_encoding = 'UTF8';
-SET standard_conforming_strings = on;
-SELECT pg_catalog.set_config('search_path', '', false);
-SET check_function_bodies = false;
-SET xmloption = content;
-SET client_min_messages = warning;
-SET row_security = off;
-
-UPDATE pg_catalog.pg_database SET datistemplate = false WHERE datname = 'template1';
-DROP DATABASE template1;
---
--- Name: template1; Type: DATABASE; Schema: -; Owner: postgres
---
-
-CREATE DATABASE template1 WITH TEMPLATE = template0 ENCODING = 'UTF8' LOCALE = 'en_US.utf8';
-
-
-ALTER DATABASE template1 OWNER TO postgres;
-
-\connect template1
-
-SET statement_timeout = 0;
-SET lock_timeout = 0;
-SET idle_in_transaction_session_timeout = 0;
-SET client_encoding = 'UTF8';
-SET standard_conforming_strings = on;
-SELECT pg_catalog.set_config('search_path', '', false);
-SET check_function_bodies = false;
-SET xmloption = content;
-SET client_min_messages = warning;
-SET row_security = off;
-
---
--- Name: DATABASE template1; Type: COMMENT; Schema: -; Owner: postgres
---
-
-COMMENT ON DATABASE template1 IS 'default template for new databases';
-
-
---
--- Name: template1; Type: DATABASE PROPERTIES; Schema: -; Owner: postgres
---
-
-ALTER DATABASE template1 IS_TEMPLATE = true;
-
-
-\connect template1
-
-SET statement_timeout = 0;
-SET lock_timeout = 0;
-SET idle_in_transaction_session_timeout = 0;
-SET client_encoding = 'UTF8';
-SET standard_conforming_strings = on;
-SELECT pg_catalog.set_config('search_path', '', false);
-SET check_function_bodies = false;
-SET xmloption = content;
-SET client_min_messages = warning;
-SET row_security = off;
-
---
--- Name: DATABASE template1; Type: ACL; Schema: -; Owner: postgres
---
-
-REVOKE CONNECT,TEMPORARY ON DATABASE template1 FROM PUBLIC;
-GRANT CONNECT ON DATABASE template1 TO PUBLIC;
-
-
---
--- PostgreSQL database dump complete
---
-
---
--- Database "cinemart" dump
---
-
---
--- PostgreSQL database dump
---
-
--- Dumped from database version 13.1 (Debian 13.1-1.pgdg100+1)
--- Dumped by pg_dump version 13.1 (Debian 13.1-1.pgdg100+1)
-
-SET statement_timeout = 0;
-SET lock_timeout = 0;
-SET idle_in_transaction_session_timeout = 0;
-SET client_encoding = 'UTF8';
-SET standard_conforming_strings = on;
-SELECT pg_catalog.set_config('search_path', '', false);
-SET check_function_bodies = false;
-SET xmloption = content;
-SET client_min_messages = warning;
-SET row_security = off;
-
---
 -- Name: cinemart; Type: DATABASE; Schema: -; Owner: postgres
---
-
-CREATE DATABASE cinemart WITH TEMPLATE = template0 ENCODING = 'UTF8' LOCALE = 'en_US.utf8';
-
-
-ALTER DATABASE cinemart OWNER TO postgres;
-
-\connect cinemart
 
 SET statement_timeout = 0;
 SET lock_timeout = 0;
@@ -178,9 +20,6 @@ CREATE TYPE public.genre AS (
 	name text
 );
 
-
-ALTER TYPE public.genre OWNER TO postgres;
-
 --
 -- Name: delete_invoices_trigger(); Type: FUNCTION; Schema: public; Owner: postgres
 --
@@ -195,9 +34,6 @@ BEGIN
   RETURN OLD;
 END;
 $$;
-
-
-ALTER FUNCTION public.delete_invoices_trigger() OWNER TO postgres;
 
 --
 -- Name: delete_tickets_trigger(); Type: FUNCTION; Schema: public; Owner: postgres
@@ -215,9 +51,6 @@ BEGIN
 END;
 $$;
 
-
-ALTER FUNCTION public.delete_tickets_trigger() OWNER TO postgres;
-
 --
 -- Name: insert_tickets_trigger(); Type: FUNCTION; Schema: public; Owner: postgres
 --
@@ -234,9 +67,6 @@ BEGIN
 END;
 $$;
 
-
-ALTER FUNCTION public.insert_tickets_trigger() OWNER TO postgres;
-
 --
 -- Name: update_invoices_trigger(); Type: FUNCTION; Schema: public; Owner: postgres
 --
@@ -251,9 +81,6 @@ BEGIN
   RETURN NEW;
 END;
 $$;
-
-
-ALTER FUNCTION public.update_invoices_trigger() OWNER TO postgres;
 
 SET default_tablespace = '';
 
@@ -270,9 +97,6 @@ CREATE TABLE public.admins (
     created_at timestamp without time zone DEFAULT CURRENT_TIMESTAMP NOT NULL
 );
 
-
-ALTER TABLE public.admins OWNER TO postgres;
-
 --
 -- Name: admins_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
 --
@@ -284,9 +108,6 @@ CREATE SEQUENCE public.admins_id_seq
     NO MINVALUE
     NO MAXVALUE
     CACHE 1;
-
-
-ALTER TABLE public.admins_id_seq OWNER TO postgres;
 
 --
 -- Name: admins_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
@@ -305,9 +126,6 @@ CREATE TABLE public.auth (
     created_at timestamp without time zone DEFAULT CURRENT_TIMESTAMP NOT NULL
 );
 
-
-ALTER TABLE public.auth OWNER TO postgres;
-
 --
 -- Name: invoices; Type: TABLE; Schema: public; Owner: postgres
 --
@@ -322,9 +140,6 @@ CREATE TABLE public.invoices (
     created_at timestamp without time zone DEFAULT CURRENT_TIMESTAMP NOT NULL
 );
 
-
-ALTER TABLE public.invoices OWNER TO postgres;
-
 --
 -- Name: invoices_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
 --
@@ -336,9 +151,6 @@ CREATE SEQUENCE public.invoices_id_seq
     NO MINVALUE
     NO MAXVALUE
     CACHE 1;
-
-
-ALTER TABLE public.invoices_id_seq OWNER TO postgres;
 
 --
 -- Name: invoices_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
@@ -359,9 +171,6 @@ CREATE SEQUENCE public.invoices_schedule_seq
     NO MAXVALUE
     CACHE 1;
 
-
-ALTER TABLE public.invoices_schedule_seq OWNER TO postgres;
-
 --
 -- Name: invoices_schedule_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
 --
@@ -381,9 +190,6 @@ CREATE SEQUENCE public.invoices_user_id_seq
     NO MAXVALUE
     CACHE 1;
 
-
-ALTER TABLE public.invoices_user_id_seq OWNER TO postgres;
-
 --
 -- Name: invoices_user_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
 --
@@ -401,9 +207,6 @@ CREATE TABLE public.management (
     created_at timestamp without time zone DEFAULT CURRENT_TIMESTAMP NOT NULL
 );
 
-
-ALTER TABLE public.management OWNER TO postgres;
-
 --
 -- Name: management_manager_seq; Type: SEQUENCE; Schema: public; Owner: postgres
 --
@@ -415,9 +218,6 @@ CREATE SEQUENCE public.management_manager_seq
     NO MINVALUE
     NO MAXVALUE
     CACHE 1;
-
-
-ALTER TABLE public.management_manager_seq OWNER TO postgres;
 
 --
 -- Name: management_manager_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
@@ -438,9 +238,6 @@ CREATE SEQUENCE public.management_theater_seq
     NO MAXVALUE
     CACHE 1;
 
-
-ALTER TABLE public.management_theater_seq OWNER TO postgres;
-
 --
 -- Name: management_theater_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
 --
@@ -459,9 +256,6 @@ CREATE TABLE public.managers (
     created_at timestamp without time zone DEFAULT CURRENT_TIMESTAMP NOT NULL
 );
 
-
-ALTER TABLE public.managers OWNER TO postgres;
-
 --
 -- Name: managers_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
 --
@@ -473,9 +267,6 @@ CREATE SEQUENCE public.managers_id_seq
     NO MINVALUE
     NO MAXVALUE
     CACHE 1;
-
-
-ALTER TABLE public.managers_id_seq OWNER TO postgres;
 
 --
 -- Name: managers_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
@@ -499,9 +290,6 @@ CREATE TABLE public.movies (
     created_at timestamp without time zone DEFAULT CURRENT_TIMESTAMP NOT NULL
 );
 
-
-ALTER TABLE public.movies OWNER TO postgres;
-
 --
 -- Name: movies_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
 --
@@ -513,9 +301,6 @@ CREATE SEQUENCE public.movies_id_seq
     NO MINVALUE
     NO MAXVALUE
     CACHE 1;
-
-
-ALTER TABLE public.movies_id_seq OWNER TO postgres;
 
 --
 -- Name: movies_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
@@ -541,9 +326,6 @@ CREATE TABLE public.schedules (
     created_at timestamp without time zone DEFAULT CURRENT_TIMESTAMP NOT NULL
 );
 
-
-ALTER TABLE public.schedules OWNER TO postgres;
-
 --
 -- Name: schedules_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
 --
@@ -555,9 +337,6 @@ CREATE SEQUENCE public.schedules_id_seq
     NO MINVALUE
     NO MAXVALUE
     CACHE 1;
-
-
-ALTER TABLE public.schedules_id_seq OWNER TO postgres;
 
 --
 -- Name: schedules_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
@@ -578,9 +357,6 @@ CREATE SEQUENCE public.schedules_movie_seq
     NO MAXVALUE
     CACHE 1;
 
-
-ALTER TABLE public.schedules_movie_seq OWNER TO postgres;
-
 --
 -- Name: schedules_movie_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
 --
@@ -600,9 +376,6 @@ CREATE SEQUENCE public.schedules_theater_seq
     NO MAXVALUE
     CACHE 1;
 
-
-ALTER TABLE public.schedules_theater_seq OWNER TO postgres;
-
 --
 -- Name: schedules_theater_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
 --
@@ -621,9 +394,6 @@ CREATE TABLE public.theaters (
     created_at timestamp without time zone DEFAULT CURRENT_TIMESTAMP NOT NULL
 );
 
-
-ALTER TABLE public.theaters OWNER TO postgres;
-
 --
 -- Name: theaters_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
 --
@@ -635,9 +405,6 @@ CREATE SEQUENCE public.theaters_id_seq
     NO MINVALUE
     NO MAXVALUE
     CACHE 1;
-
-
-ALTER TABLE public.theaters_id_seq OWNER TO postgres;
 
 --
 -- Name: theaters_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
@@ -658,9 +425,6 @@ CREATE TABLE public.tickets (
     created_at timestamp without time zone DEFAULT CURRENT_TIMESTAMP NOT NULL
 );
 
-
-ALTER TABLE public.tickets OWNER TO postgres;
-
 --
 -- Name: tickets_invoice_seq; Type: SEQUENCE; Schema: public; Owner: postgres
 --
@@ -672,9 +436,6 @@ CREATE SEQUENCE public.tickets_invoice_seq
     NO MINVALUE
     NO MAXVALUE
     CACHE 1;
-
-
-ALTER TABLE public.tickets_invoice_seq OWNER TO postgres;
 
 --
 -- Name: tickets_invoice_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
@@ -697,9 +458,6 @@ CREATE TABLE public.users (
     created_at timestamp without time zone DEFAULT CURRENT_TIMESTAMP NOT NULL
 );
 
-
-ALTER TABLE public.users OWNER TO postgres;
-
 --
 -- Name: users_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
 --
@@ -711,9 +469,6 @@ CREATE SEQUENCE public.users_id_seq
     NO MINVALUE
     NO MAXVALUE
     CACHE 1;
-
-
-ALTER TABLE public.users_id_seq OWNER TO postgres;
 
 --
 -- Name: users_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
@@ -844,7 +599,6 @@ COPY public.auth (token, refresh_token, created_at) FROM stdin;
 COPY public.invoices (id, user_id, schedule, paid, tickets_count, cost, created_at) FROM stdin;
 12	2	14	f	14	840000	2020-12-21 02:06:36.893918
 2	2	10	f	4	200000	2020-12-20 14:32:12.54275
-13	3	12	f	1	50000	2020-12-21 02:23:52.453963
 3	2	10	f	3	150000	2020-12-20 15:05:45.872252
 4	2	9	f	6	300000	2020-12-20 15:39:38.664491
 5	2	7	f	6	300000	2020-12-20 15:43:46.340241
@@ -869,7 +623,7 @@ COPY public.management (manager, theater, created_at) FROM stdin;
 5	5	2020-12-19 20:43:12.885776
 6	6	2020-12-19 21:05:08.922693
 7	7	2020-12-19 21:07:13.391508
-8	3	2020-12-19 21:13:21.825457
+10	8	2021-08-24 23:22:52.986221
 \.
 
 
@@ -881,11 +635,11 @@ COPY public.managers (id, password, mail, created_at) FROM stdin;
 3	bcrypt+sha512$608cd17a09f3ebbf6e03531301f061fc$12$12a22593922ef92748aa0d490974c42fa097dc5c003b3b11	cinestar@manager.com	2020-12-19 20:17:44.761442
 2	bcrypt+sha512$74b008a792fd4c92e4d7313edf204434$12$203fb4d6d1f5247fb897a7a0f374a02c9d0dcb8964b580f9	megastar@manager.com	2020-12-19 20:06:12.723672
 4	bcrypt+sha512$a33eb5916b207f7ce47b65ae79f21db1$12$e3019d756006f27ab68bc3f59e90ead2c8b71e25560b0371	cinebox@manager.com	2020-12-19 20:34:13.954909
-5	bcrypt+sha512$eac144fbb76e7fb7d3b9609043dc2033$12$7d5518d1b9eba428ac2a5257fa1366651a163e0d8592d51c	ddc@manager.com	2020-12-19 20:43:12.869494
 6	bcrypt+sha512$b80081beadb09092a5aa95f3baafb343$12$83037e341d6a75f771f3a82fd6045b4fa88ba3294d3035f1	cgv@manager.com	2020-12-19 21:05:08.906169
-8	bcrypt+sha512$2c29f8bfdba6f3214028ad6260fdbd9e$12$ae96a70ccb49d474e9837b62599c2f7dee2fe941e505cec1	3hoim@sad24	2020-12-19 21:13:21.792059
 7	bcrypt+sha512$79f1a8ed13351512157f52da82cb8cc4$12$a99e1ddff126c001b1011fb81a3d3dacca68772144910b52	galaxy@manager.com	2020-12-19 21:07:13.375827
 1	bcrypt+sha512$023ed58be3dde44839554ffb8272337f$12$b76044f0c21cfea67af2d6dd07b82f4e945c8d182df00a3a	lotte@manager.com	2020-12-18 16:11:43.714063
+5	bcrypt+sha512$6aa4e88037578079041570d902f09ba2$12$ddf0f39c173f247053f5cfa4a54cb6930a7325e3919cd3be	dongda@manager.com	2020-12-19 20:43:12.869494
+10	bcrypt+sha512$42f399402eba70225579b6f2de9921da$12$bc557c4828dbc7f02fb188800d1ab7be754eb842c5e26cd2	bhd@manager.com	2021-08-24 23:22:52.819365
 \.
 
 
@@ -908,6 +662,7 @@ COPY public.movies (id, runtime, genres, overview, title, poster_path, backdrop_
 579400	109	[{"id": 18, "name": "Drama"}, {"id": 10402, "name": "Music"}]	David Bowie went to America for the first time to promote his third album, The Man Who Sold the World. There, he embarked on a coast-to-coast publicity tour. During this tour, Bowie came up with the idea of his iconic Ziggy Stardust character, inspired by artists like Iggy Pop and Lou Reed.	Stardust	https://image.tmdb.org/t/p/w780/woOQx1s4mNVAprRpky3ntRgdlf4.jpg	https://image.tmdb.org/t/p/w1280/cfCEAkvTS49uOxw23qvX3GxNyv9.jpg	2020-12-19 18:14:38.474675
 336016	94	[{"id": 10749, "name": "Romance"}, {"id": 18, "name": "Drama"}]	The story of one man not only battling the bottle, but the city that won’t let him put it down.	Ruben Guthrie	https://image.tmdb.org/t/p/w780/4A1j72rWGC01aajRB58n8bN3JHd.jpg	https://image.tmdb.org/t/p/w1280/ujV9zhJc5N4x3XhEkCa3jBlhUBT.jpg	2020-12-19 17:41:20.725458
 336082	138	[{"id": 28, "name": "Action"}, {"id": 80, "name": "Crime"}, {"id": 35, "name": "Comedy"}]	A conman faces his biggest threat when he is in urgent need for a lump sum and a policeman is after him to catch him red handed.	Dohchay	https://image.tmdb.org/t/p/w780/yBz390NbT9rAPZiXoWZ6hw7b95.jpg	https://image.tmdb.org/t/p/w1280/A2TI3LajhDZlBkuUIkUMT6ZOGLQ.jpg	2020-12-19 17:47:05.366544
+713825	79	[{"id": 28, "name": "Action"}, {"id": 878, "name": "Science Fiction"}]	Unconscious soldiers are dropped into a testing site only to discover their memories have been wiped and that once docile machines are the new intelligence.	Robot Riot	https://image.tmdb.org/t/p/w780/pXv4qbWyj6ycMaWkK2LzlizZQjf.jpg	https://image.tmdb.org/t/p/w1280/tWxCVe4rQZa3BvR3tMT3t74oVTT.jpg	2020-12-19 18:24:28.034095
 90812	91	[{"id": 37, "name": "Western"}]	Four people are killed in a saloon hold-up. The townspeople pin the murders on local no-count black sheep Chester Conway. Lawyer Jeff Plummer and prostitute Polly Winters don't believe that Chester is guilty of these crimes, so they hire smooth and suave gunman Silver to prove Chester's innocence and find the real killers.	The Price of Death	https://image.tmdb.org/t/p/w780/i2Mw15QkyFTeH79iXvDBbL0RmXn.jpg	https://image.tmdb.org/t/p/w1280/uPDRXrFw1spcshUKIT5apDfnDN6.jpg	2020-12-19 17:51:05.599012
 560144	110	[{"id": 878, "name": "Science Fiction"}, {"id": 28, "name": "Action"}]	When a virus threatens to turn the now earth-dwelling friendly alien hybrids against humans, Captain Rose Corley must lead a team of elite mercenaries on a mission to the alien world in order to save what's left of humanity.	Skylines	https://image.tmdb.org/t/p/w780/ewMNLXgDyiyaBGdCzQqCF8hKWy2.jpg	https://image.tmdb.org/t/p/w1280/3WQqRrrctYQZC1Ub7OhI8BybScM.jpg	2020-12-19 18:04:44.044796
 632322	93	[{"id": 18, "name": "Drama"}, {"id": 10749, "name": "Romance"}]	A couple's wedding plans are thrown off course when the groom is diagnosed with liver cancer.	All My Life	https://image.tmdb.org/t/p/w780/xoKZ4ZkVApcTaTYlGoZ3J8xcIzG.jpg	https://image.tmdb.org/t/p/w1280/7Gzsn4yiwMSXvYcbWXsoDhq8QO2.jpg	2020-12-19 18:05:32.233484
@@ -924,7 +679,6 @@ COPY public.movies (id, runtime, genres, overview, title, poster_path, backdrop_
 529203	95	[{"id": 12, "name": "Adventure"}, {"id": 14, "name": "Fantasy"}, {"id": 10751, "name": "Family"}, {"id": 16, "name": "Animation"}]	After leaving their cave, the Croods encounter their biggest threat since leaving: another family called the Bettermans, who claim and show to be better and evolved. Grug grows suspicious of the Betterman parents, Phil and Hope,  as they secretly plan to break up his daughter Eep with her loving boyfriend Guy to ensure that their daughter Dawn has a loving and smart partner to protect her.	The Croods: A New Age	https://image.tmdb.org/t/p/w780/tK1zy5BsCt1J4OzoDicXmr0UTFH.jpg	https://image.tmdb.org/t/p/w1280/cjaOSjsjV6cl3uXdJqimktT880L.jpg	2020-12-19 18:22:41.008942
 553604	98	[{"id": 28, "name": "Action"}, {"id": 53, "name": "Thriller"}, {"id": 80, "name": "Crime"}, {"id": 18, "name": "Drama"}]	A bank robber tries to turn himself in because he's falling in love and wants to live an honest life...but when he realizes the Feds are more corrupt than him, he must fight back to clear his name.	Honest Thief	https://image.tmdb.org/t/p/w780/zeD4PabP6099gpE0STWJrJrCBCs.jpg	https://image.tmdb.org/t/p/w1280/tYkMtYPNpUdLdzGDUTC5atyMh9X.jpg	2020-12-19 18:23:34.481439
 581392	114	[{"id": 28, "name": "Action"}, {"id": 27, "name": "Horror"}, {"id": 53, "name": "Thriller"}]	A soldier and his team battle hordes of post-apocalyptic zombies in the wastelands of the Korean Peninsula.	Peninsula	https://image.tmdb.org/t/p/w780/sy6DvAu72kjoseZEjocnm2ZZ09i.jpg	https://image.tmdb.org/t/p/w1280/d2UxKyaJ5GgzuHaSsWinFfv3g6L.jpg	2020-12-19 18:24:03.344519
-713825	79	[{"id": 28, "name": "Action"}, {"id": 878, "name": "Science Fiction"}]	Unconscious soldiers are dropped into a testing site only to discover their memories have been wiped and that once docile machines are the new intelligence.	Robot Riot	https://image.tmdb.org/t/p/w780/pXv4qbWyj6ycMaWkK2LzlizZQjf.jpg	https://image.tmdb.org/t/p/w1280/tWxCVe4rQZa3BvR3tMT3t74oVTT.jpg	2020-12-19 18:24:28.034095
 682377	97	[{"id": 28, "name": "Action"}, {"id": 35, "name": "Comedy"}]	When Anna Wyncomb is introduced to an an underground, all-female fight club in order to turn the mess of her life around, she discovers she is much more personally connected to the history of the club than she could ever imagine.	Chick Fight	https://image.tmdb.org/t/p/w780/4ZocdxnOO6q2UbdKye2wgofLFhB.jpg	https://image.tmdb.org/t/p/w1280/fTDzKoQIh1HeyjfpG5AHMi2jxAJ.jpg	2020-12-19 18:25:44.483052
 590995	94	[{"id": 27, "name": "Horror"}, {"id": 18, "name": "Drama"}, {"id": 14, "name": "Fantasy"}]	An eclectic foursome of aspiring teenage witches get more than they bargained for as they lean into their newfound powers.	The Craft: Legacy	https://image.tmdb.org/t/p/w780/lhMIra0pqWNuD6CIXoTmGwZ0EBS.jpg	https://image.tmdb.org/t/p/w1280/lIE7kfdLBRd0KENNtOaIqPPWNqh.jpg	2020-12-19 18:26:22.058843
 724989	98	[{"id": 28, "name": "Action"}, {"id": 53, "name": "Thriller"}]	The work of billionaire tech CEO Donovan Chalmers is so valuable that he hires mercenaries to protect it, and a terrorist group kidnaps his daughter just to get it.	Hard Kill	https://image.tmdb.org/t/p/w780/ugZW8ocsrfgI95pnQ7wrmKDxIe.jpg	https://image.tmdb.org/t/p/w1280/86L8wqGMDbwURPni2t7FQ0nDjsH.jpg	2020-12-19 18:26:49.795979
@@ -940,6 +694,7 @@ COPY public.movies (id, runtime, genres, overview, title, poster_path, backdrop_
 592643	117	[{"id": 28, "name": "Action"}, {"id": 18, "name": "Drama"}]	The eldest son of a ruthlessly tough MMA champion must fight his way out of the abusive cycle his father has continued.	Embattled	https://image.tmdb.org/t/p/w780/7Tx14J5al5anC5BCnhy1fegOyxW.jpg	https://image.tmdb.org/t/p/w1280/g8aklDRGzz4xWh9IDJvwDiT7hsv.jpg	2020-12-19 18:34:44.137169
 540023	97	[{"id": 18, "name": "Drama"}, {"id": 10749, "name": "Romance"}]	New parents Adrienne and Matteo are forced to reckon with trauma amidst their troubled relationship. They must revisit the memories of their past and unravel haunting truths in order to face their uncertain future.	Wander Darkly	https://image.tmdb.org/t/p/w780/96snLzPYifC4FyL2uOnzo4DPgCv.jpg	https://image.tmdb.org/t/p/w1280/eloKau9wkizru6nLwS6NxPYk5Xc.jpg	2020-12-19 18:35:08.96861
 516632	137	[{"id": 80, "name": "Crime"}, {"id": 18, "name": "Drama"}, {"id": 27, "name": "Horror"}]	After a group of teens from a small Midwestern town begin to mysteriously disappear, the locals believe it is the work of an urban legend known as The Empty Man. As a retired cop investigates and struggles to make sense of the stories, he discovers a secretive group and their attempts to summon a horrific, mystical entity, and soon his life—and the lives of those close to him—are in grave danger.	The Empty Man	https://image.tmdb.org/t/p/w780/gBRM1EgfslcxcZCSf6Vp89VYCmP.jpg	https://image.tmdb.org/t/p/w1280/9nm3eQY0FiPL391vlQrr4Q5WC9w.jpg	2020-12-19 18:35:37.616463
+164558	92	[{"id": 99, "name": "Documentary"}, {"id": 10402, "name": "Music"}]	Go behind the scenes during One Directions sell out "Take Me Home" tour and experience life on the road.	One Direction: This Is Us	https://image.tmdb.org/t/p/w780/b720e7DW3nqRJaUH9xpTtvYhnUj.jpg	https://image.tmdb.org/t/p/w1280/azAkT1jCMwh4FgzDPJzYCsqnGil.jpg	2020-12-19 19:06:42.071835
 650783	105	[{"id": 28, "name": "Action"}, {"id": 35, "name": "Comedy"}, {"id": 80, "name": "Crime"}]	After his latest film bombs, Producer Max Barber creates a new film, all to kill his lead, Duke Montana, in a stunt for insurance. But when Duke is unable to be killed in a basic stunt, Max puts him into more dangerous situations.	The Comeback Trail	https://image.tmdb.org/t/p/w780/1aAJreHMi0eKh0emmMkc7RTovaT.jpg	https://image.tmdb.org/t/p/w1280/kbvdJO4ABoWaGeuiQuqFe0JZSp9.jpg	2020-12-19 18:36:08.050202
 558574	94	[{"id": 80, "name": "Crime"}, {"id": 18, "name": "Drama"}, {"id": 28, "name": "Action"}]	Five post grads figure the best way to get back at the unfair economy and live the life they've always wanted is to steal from the rich and give to themselves.	Echo Boomers	https://image.tmdb.org/t/p/w780/nQbd4u1NrvcXUbfnmCQYxkF5GIC.jpg	https://image.tmdb.org/t/p/w1280/A7eqPt8jNich5GGLpfQsjpVPWr3.jpg	2020-12-19 18:36:37.961765
 729293	84	[{"id": 80, "name": "Crime"}, {"id": 18, "name": "Drama"}, {"id": 28, "name": "Action"}]	A young man returns to his hometown after years of being gone to get revenge on a gang that ruined his life.	Vigilante	https://image.tmdb.org/t/p/w780/7kxqUdjEZPWu8lIZSJmzsHCF4Pz.jpg	https://image.tmdb.org/t/p/w1280/i7w3h5RX92AKrEpNoE0DQzIfhZ8.jpg	2020-12-19 18:37:06.304038
@@ -984,7 +739,6 @@ COPY public.movies (id, runtime, genres, overview, title, poster_path, backdrop_
 914	125	[{"id": 35, "name": "Comedy"}]	Dictator Adenoid Hynkel tries to expand his empire while a poor Jewish barber tries to avoid persecution from Hynkel's regime.	The Great Dictator	https://image.tmdb.org/t/p/w780/1QpO9wo7JWecZ4NiBuu625FiY1j.jpg	https://image.tmdb.org/t/p/w1280/7jTgJ24UPkWeb5zzH7ihs554xVy.jpg	2020-12-19 19:04:16.108649
 12477	89	[{"id": 16, "name": "Animation"}, {"id": 18, "name": "Drama"}, {"id": 10752, "name": "War"}]	In the final months of World War II, 14-year-old Seita and his sister Setsuko are orphaned when their mother is killed during an air raid in Kobe, Japan. After a falling out with their aunt, they move into an abandoned bomb shelter. With no surviving relatives and their emergency rations depleted, Seita and Setsuko struggle to survive.	Grave of the Fireflies	https://image.tmdb.org/t/p/w780/wcNkHDbyc290hcWk7KXbBZUuXpq.jpg	https://image.tmdb.org/t/p/w1280/tDFvXn4tane9lUvFAFAUkMylwSr.jpg	2020-12-19 19:04:39.041368
 244786	107	[{"id": 18, "name": "Drama"}, {"id": 10402, "name": "Music"}]	Under the direction of a ruthless instructor, a talented young drummer begins to pursue perfection at any cost, even his humanity.	Whiplash	https://image.tmdb.org/t/p/w780/6uSPcdGNA2A6vJmCagXkvnutegs.jpg	https://image.tmdb.org/t/p/w1280/fRGxZuo7jJUWQsVg9PREb98Aclp.jpg	2020-12-19 19:05:43.336777
-164558	92	[{"id": 99, "name": "Documentary"}, {"id": 10402, "name": "Music"}]	Go behind the scenes during One Directions sell out "Take Me Home" tour and experience life on the road.	One Direction: This Is Us	https://image.tmdb.org/t/p/w780/b720e7DW3nqRJaUH9xpTtvYhnUj.jpg	https://image.tmdb.org/t/p/w1280/azAkT1jCMwh4FgzDPJzYCsqnGil.jpg	2020-12-19 19:06:42.071835
 73	119	[{"id": 18, "name": "Drama"}]	Derek Vineyard is paroled after serving 3 years in prison for killing two African-American men. Through his brother, Danny Vineyard's narration, we learn that before going to prison, Derek was a skinhead and the leader of a violent white supremacist gang that committed acts of racial crime throughout L.A. and his actions greatly influenced Danny. Reformed and fresh out of prison, Derek severs contact with the gang and becomes determined to keep Danny from going down the same violent path as he did.	American History X	https://image.tmdb.org/t/p/w780/c2gsmSQ2Cqv8zosqKOCwRS0GFBS.jpg	https://image.tmdb.org/t/p/w1280/nOO83QWfbRxMdru0vtQ7jGNT5Bq.jpg	2020-12-19 19:07:52.997316
 423	150	[{"id": 18, "name": "Drama"}, {"id": 10752, "name": "War"}]	The true story of pianist Władysław Szpilman's experiences in Warsaw during the Nazi occupation. When the Jews of the city find themselves forced into a ghetto, Szpilman finds work playing in a café; and when his family is deported in 1942, he stays behind, works for a while as a laborer, and eventually goes into hiding in the ruins of the war-torn city.	The Pianist	https://image.tmdb.org/t/p/w780/3DzePKMbLMIM636S6syCy3cLPqj.jpg	https://image.tmdb.org/t/p/w1280/A7r8GRpvOojI2Vl5EEJfAIfzCg9.jpg	2020-12-19 19:09:02.306626
 476292	115	[{"id": 16, "name": "Animation"}, {"id": 14, "name": "Fantasy"}, {"id": 10749, "name": "Romance"}, {"id": 18, "name": "Drama"}]	A story of encounters and partings interwoven between people; this is a human drama with feelings that touch one's heart gradually, which everyone has experienced at least once.	Maquia: When the Promised Flower Blooms	https://image.tmdb.org/t/p/w780/hL3NqRE2ccR4Y2sYSJTrmalRjrz.jpg	https://image.tmdb.org/t/p/w1280/yjfwNSDljAKsuHwwE34xjlY3tQj.jpg	2020-12-19 19:09:24.513228
@@ -1010,6 +764,7 @@ COPY public.movies (id, runtime, genres, overview, title, poster_path, backdrop_
 506574	106	[{"id": 10751, "name": "Family"}, {"id": 10770, "name": "TV Movie"}, {"id": 10402, "name": "Music"}, {"id": 12, "name": "Adventure"}, {"id": 14, "name": "Fantasy"}]	The teenagers of Disney's most infamous villains return to the Isle of the Lost to recruit a new batch of villainous offspring to join them at Auradon Prep.	Descendants 3	https://image.tmdb.org/t/p/w780/7IRy0iHdaS0JI3ng4ZYlk5gLSFn.jpg	https://image.tmdb.org/t/p/w1280/iBJCHz6wWgyxbDmUD2Wk5huxbwS.jpg	2020-12-20 18:37:55.124145
 523931	90	[{"id": 28, "name": "Action"}, {"id": 878, "name": "Science Fiction"}, {"id": 27, "name": "Horror"}, {"id": 10770, "name": "TV Movie"}]	A military vessel on the search for an unidentified submersible finds themselves face to face with a giant shark, forced to use only what they have on board to defend themselves from the monstrous beast.	Megalodon	https://image.tmdb.org/t/p/w780/hES2eVAbVt08JJTqgu3jmI34Yxx.jpg	https://image.tmdb.org/t/p/w1280/fXFQnOSbybaU9h2kJ3jtRUU4OpA.jpg	2020-12-20 18:38:21.3076
 37211	91	[{"id": 16, "name": "Animation"}, {"id": 35, "name": "Comedy"}, {"id": 10751, "name": "Family"}, {"id": 9648, "name": "Mystery"}, {"id": 10770, "name": "TV Movie"}]	Shaggy is turned into a werewolf, and it's up to Scooby, Scrappy and Shaggy's girlfriend to help him win a race against other monsters, and become human again.	Scooby-Doo! and the Reluctant Werewolf	https://image.tmdb.org/t/p/w780/cXUQuHnNBxFSZAmYfogMfrcvMk7.jpg	https://image.tmdb.org/t/p/w1280/yB32nYB9WfXye681xtx3t3aQ6AD.jpg	2020-12-20 18:39:23.108381
+167250	14	[{"id": 37, "name": "Western"}]	An Indian village is forced to leave its land by white settlers, and must make a long and weary journey to find a new home. The settlers make one young Indian woman stay behind. This woman is thus separated from her sweetheart, whose elderly father needs his help on the journey ahead	The Redman's View	https://image.tmdb.org/t/p/w780/bkS2O2cn2zjhr58etRV92lju9Ww.jpg	https://image.tmdb.org/t/p/w1280/jYfCSxUGYN9vYiOqAPuIwPjovAv.jpg	2020-12-20 18:55:30.873656
 134375	87	[{"id": 35, "name": "Comedy"}, {"id": 80, "name": "Crime"}, {"id": 10751, "name": "Family"}, {"id": 10770, "name": "TV Movie"}]	8-year-old Finn is terrified to learn his family is relocating from sunny California to Maine in the scariest house he has ever seen! Convinced that his new house is haunted, Finn sets up a series of elaborate traps to catch the “ghost” in action. Left home alone with his sister while their parents are stranded across town, Finn’s traps catch a new target – a group of thieves who have targeted Finn’s house.	Home Alone: The Holiday Heist	https://image.tmdb.org/t/p/w780/z9hjtl4Phl2n1l4y1IiLUVJtZsz.jpg	https://image.tmdb.org/t/p/w1280/3mO7fimik20gwkVNXNxbi0RY3wg.jpg	2020-12-20 18:40:05.735442
 635780	103	[{"id": 10752, "name": "War"}, {"id": 28, "name": "Action"}]	After rescuing Daniel from the terrorist Black Mask Organization, the team uncovers plans for a deadly bomb set to detonate in 36 hours that threatens world order. With no time to recover, Daniel must throw his life back on the line as he and his elite team of soldiers race against time to find the bomb and defeat their enemy once and for all. Outnumbered and overmatched, each soldier must find their inner strength and skill to overcome insurmountable odds.	Rogue Warfare: Death of a Nation	https://image.tmdb.org/t/p/w780/8GVpIEBqlRBvx28G0LfEX0U8D2k.jpg	https://image.tmdb.org/t/p/w1280/iQxJuPqCGOO4Iy3uFbMWCIGHkwE.jpg	2020-12-20 18:48:31.702866
 744955	80	[{"id": 10749, "name": "Romance"}, {"id": 10770, "name": "TV Movie"}]	Josie Jennings a celebrated, romantic, 35-year old chef in the city heads home to spend the holidays at the quaint, magical bed and breakfast where she grew up, and where her mother Shannon has just opened a new restaurant. Famous food critic Tanner Rhodes, who has given Josie harsh reviews in the past, comes to town to review the new restaurant and Josie’s Christmas Cuisine. As the holidays unfold, Josie and Tanner get to know each other better, and a romance soon begins to blossom but will Tanner find a way to right his wrongs, write a rave review for the bistro’s delicious cuisine, and win Josie’s heart by Christmas Eve?	Christmas on the Menu	https://image.tmdb.org/t/p/w780/998E0DvDcK3kGO3IJT4WmUVA1Rt.jpg	https://image.tmdb.org/t/p/w1280/dBJqxmM8GOyLfb3I0A1Vry0S81W.jpg	2020-12-20 18:40:32.622375
@@ -1023,7 +778,6 @@ COPY public.movies (id, runtime, genres, overview, title, poster_path, backdrop_
 768141	106	[{"id": 10402, "name": "Music"}, {"id": 99, "name": "Documentary"}]	An intimate concert film, in which Taylor Swift performs each song from her album 'folklore' in order, as she reveals the meaning and the stories behind all 17 tracks for the very first time.	Folklore: The Long Pond Studio Sessions	https://image.tmdb.org/t/p/w780/4iroJUn8YuQBekDwGy7r61YHXiu.jpg	https://image.tmdb.org/t/p/w1280/xndolqiw6jMhDDkkw1UPuD1xfrT.jpg	2020-12-20 18:50:27.656676
 689249	57	[{"id": 99, "name": "Documentary"}]	A documentary on why and how 'Money Heist' sparked a wave of enthusiasm around the world for a lovable group of thieves and their professor.	Money Heist: The Phenomenon	https://image.tmdb.org/t/p/w780/AboUXTrDWEi0PuZUqaft0iwBTm7.jpg	https://image.tmdb.org/t/p/w1280/ociI5MGQXaJ2u1Fhc6WKNYy9pbn.jpg	2020-12-20 18:50:45.121979
 5698	12	[{"id": 80, "name": "Crime"}, {"id": 28, "name": "Action"}, {"id": 37, "name": "Western"}]	The clerk at the train station is assaulted and left tied by four men, then they rob the train threatening the operator. (They) take all the money and shoot a passenger when trying to run away. A little girl discovers the clerk tied and gives notice to the sheriff, who at once goes along with his men hunting the bandits.	The Great Train Robbery	https://image.tmdb.org/t/p/w780/uf7Hr1wuUh4T83Ifg5pVpwTqRdI.jpg	https://image.tmdb.org/t/p/w1280/99uGRUGS2qxNvPARiM8dkuTrUnW.jpg	2020-12-20 18:52:53.598562
-167250	14	[{"id": 37, "name": "Western"}]	An Indian village is forced to leave its land by white settlers, and must make a long and weary journey to find a new home. The settlers make one young Indian woman stay behind. This woman is thus separated from her sweetheart, whose elderly father needs his help on the journey ahead	The Redman's View	https://image.tmdb.org/t/p/w780/bkS2O2cn2zjhr58etRV92lju9Ww.jpg	https://image.tmdb.org/t/p/w1280/jYfCSxUGYN9vYiOqAPuIwPjovAv.jpg	2020-12-20 18:55:30.873656
 8	5	[{"id": 18, "name": "Drama"}, {"id": 53, "name": "Thriller"}, {"id": 9648, "name": "Mystery"}]	Adipisicing accusamus lorem recusandae perspiciatis neque sequi? Totam nisi obcaecati porro nisi reiciendis, quis Perspiciatis quam reiciendis fuga quisquam unde. Iure quidem quas saepe perferendis adipisci Excepturi in doloribus vitae?	Abc	https://image.tmdb.org/t/p/w780/iiZZdoQBEYBv6id8su7ImL0oCbD.jpg	https://image.tmdb.org/t/p/w1280/aUVCJ0HkcJIBrTJYPnTXta8h9Co.jpg	2020-12-23 02:06:11.460196
 \.
 
@@ -1056,13 +810,13 @@ COPY public.schedules (id, movie, theater, room, nrow, ncolumn, price, "time", r
 28	680	1	10	5	12	50000	2020-12-21 02:13:00	0	2020-12-21 02:12:09.434767
 29	680	1	10	5	12	50000	2020-12-21 02:13:00	0	2020-12-21 02:12:09.496109
 30	680	1	10	5	12	50000	2020-12-21 02:13:00	0	2020-12-21 02:12:09.967632
-12	335984	1	10	8	15	50000	2020-12-21 04:40:00	1	2020-12-20 16:40:59.641828
 7	577922	1	10	5	12	50000	2020-12-19 10:23:00	6	2020-12-19 16:23:20.75665
 31	13	1	10	6	12	50000	2020-12-21 03:24:00	0	2020-12-21 03:24:13.060765
 2	335984	1	10	5	12	50000	2020-11-30 16:14:00	4	2020-12-18 16:14:40.483734
 13	335984	1	10	6	12	40000	2020-12-21 17:42:00	0	2020-12-20 17:43:07.750721
 10	680	1	10	5	12	50000	2020-12-24 08:04:00	10	2020-12-20 08:04:31.675459
 11	335984	1	10	5	15	50000	2020-12-23 16:36:00	9	2020-12-20 16:36:44.684399
+12	335984	1	10	8	15	50000	2020-12-21 04:40:00	0	2020-12-20 16:40:59.641828
 \.
 
 
@@ -1145,7 +899,6 @@ COPY public.tickets (invoice, seat, seat_name, price, created_at) FROM stdin;
 12	31	C5	60000	2020-12-21 02:06:37.198197
 12	44	D5	60000	2020-12-21 02:06:37.224979
 12	3	A3	60000	2020-12-21 02:06:37.248246
-13	9	A9	50000	2020-12-21 02:23:52.503667
 \.
 
 
@@ -1155,7 +908,7 @@ COPY public.tickets (invoice, seat, seat_name, price, created_at) FROM stdin;
 
 COPY public.users (id, fullname, dob, username, password, mail, created_at) FROM stdin;
 2	John Doe	1970-01-01 00:00:00	johndoe	bcrypt+sha512$0a5a81b2585484264bb7954e097db435$12$3bfe2482f592285fc5d4808e09f722546ab7ba70d0fd3736	john@doe.com	2020-12-20 14:16:53.049131
-3	long cinemart	2011-10-05 14:48:00	long	bcrypt+sha512$45d67dad873acb390adc06c86870a061$12$0cbf1af4b313fed4dd4c99394f55196a3292c3f66b6b2994	long@cinemar.com	2020-12-21 02:22:13.880946
+4	Dummy	2011-10-05 14:48:00	dummy	bcrypt+sha512$26db392b966b209d94af503fe2e0af16$12$e92082dd8946df4a65eff6b159ebd7dddab7846ecd1d1803	dummy@user.com	2021-08-24 23:24:25.508721
 \.
 
 
@@ -1455,113 +1208,3 @@ ALTER TABLE ONLY public.invoices
 
 --
 -- PostgreSQL database dump complete
---
-
---
--- Database "postgres" dump
---
-
---
--- PostgreSQL database dump
---
-
--- Dumped from database version 13.1 (Debian 13.1-1.pgdg100+1)
--- Dumped by pg_dump version 13.1 (Debian 13.1-1.pgdg100+1)
-
-SET statement_timeout = 0;
-SET lock_timeout = 0;
-SET idle_in_transaction_session_timeout = 0;
-SET client_encoding = 'UTF8';
-SET standard_conforming_strings = on;
-SELECT pg_catalog.set_config('search_path', '', false);
-SET check_function_bodies = false;
-SET xmloption = content;
-SET client_min_messages = warning;
-SET row_security = off;
-
-DROP DATABASE postgres;
---
--- Name: postgres; Type: DATABASE; Schema: -; Owner: postgres
---
-
-CREATE DATABASE postgres WITH TEMPLATE = template0 ENCODING = 'UTF8' LOCALE = 'en_US.utf8';
-
-
-ALTER DATABASE postgres OWNER TO postgres;
-
-\connect postgres
-
-SET statement_timeout = 0;
-SET lock_timeout = 0;
-SET idle_in_transaction_session_timeout = 0;
-SET client_encoding = 'UTF8';
-SET standard_conforming_strings = on;
-SELECT pg_catalog.set_config('search_path', '', false);
-SET check_function_bodies = false;
-SET xmloption = content;
-SET client_min_messages = warning;
-SET row_security = off;
-
---
--- Name: DATABASE postgres; Type: COMMENT; Schema: -; Owner: postgres
---
-
-COMMENT ON DATABASE postgres IS 'default administrative connection database';
-
-
---
--- PostgreSQL database dump complete
---
-
---
--- Database "test" dump
---
-
---
--- PostgreSQL database dump
---
-
--- Dumped from database version 13.1 (Debian 13.1-1.pgdg100+1)
--- Dumped by pg_dump version 13.1 (Debian 13.1-1.pgdg100+1)
-
-SET statement_timeout = 0;
-SET lock_timeout = 0;
-SET idle_in_transaction_session_timeout = 0;
-SET client_encoding = 'UTF8';
-SET standard_conforming_strings = on;
-SELECT pg_catalog.set_config('search_path', '', false);
-SET check_function_bodies = false;
-SET xmloption = content;
-SET client_min_messages = warning;
-SET row_security = off;
-
---
--- Name: test; Type: DATABASE; Schema: -; Owner: postgres
---
-
-CREATE DATABASE test WITH TEMPLATE = template0 ENCODING = 'UTF8' LOCALE = 'en_US.utf8';
-
-
-ALTER DATABASE test OWNER TO postgres;
-
-\connect test
-
-SET statement_timeout = 0;
-SET lock_timeout = 0;
-SET idle_in_transaction_session_timeout = 0;
-SET client_encoding = 'UTF8';
-SET standard_conforming_strings = on;
-SELECT pg_catalog.set_config('search_path', '', false);
-SET check_function_bodies = false;
-SET xmloption = content;
-SET client_min_messages = warning;
-SET row_security = off;
-
---
--- PostgreSQL database dump complete
---
-
---
--- PostgreSQL database cluster dump complete
---
-
